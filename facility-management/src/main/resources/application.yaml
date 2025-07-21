@@ -1,0 +1,36 @@
+# Application configuration file for a Spring Boot application
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/oudb
+    username: root
+    password: Admin123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: mafiagodkill@gmail.com
+    password: Tcp-1892004
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+
+cloudinary:
+  cloud-name: dwd4b8lcx
+  api-key: 271116451416351
+  api-secret: fbyd8zzUl4OSzBFxkf4_cr4jNTk
+
+jwt:
+  secret: your-jwt-secret-key
+  expiration: 86400000 # 24 hours in milliseconds
