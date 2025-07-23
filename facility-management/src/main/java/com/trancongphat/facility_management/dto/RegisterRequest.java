@@ -1,5 +1,6 @@
 package com.trancongphat.facility_management.dto;
 
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 public class RegisterRequest {

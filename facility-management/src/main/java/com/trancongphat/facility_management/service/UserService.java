@@ -40,9 +40,9 @@ public class UserService {
         user.setFullName(req.getFullName());
         user.setStudentId(req.getStudentId());
         user.setAvatar(avatarUrl);
-        user.setRole(User.Role.STUDENT);
+        user.setRole(User.Role.student);
         user.setVerified(false);
-        user.setStatus(User.Status.INACTIVE);
+        user.setStatus(User.Status.inactive);
         user.setVerificationToken(token);
         user.setTokenExpiresAt(Timestamp.valueOf(LocalDateTime.now().plusHours(24)));
         user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
@@ -59,7 +59,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Token không hợp lệ."));
 
         user.setVerified(true);
-        user.setStatus(User.Status.ACTIVE);
+        user.setStatus(User.Status.active);
         user.setVerificationToken(null);
         user.setTokenExpiresAt(null);
         userRepository.save(user);

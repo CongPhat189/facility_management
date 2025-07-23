@@ -54,15 +54,15 @@ public class User {
 
 
     public enum Role {
-        STUDENT,
-        LECTURER,
-        ADMIN
+        student,
+        lecturer,
+        admin
     }
 
     public enum Status {
-        ACTIVE,
-        INACTIVE,
-        LOCKED
+        active,
+        locked,
+        inactive
     }
 
     public Timestamp getTokenExpiresAt() {

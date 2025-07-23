@@ -18,6 +18,7 @@ public class EmailService {
         msg.setTo(toEmail);
         msg.setSubject("Xác thực tài khoản OU");
         msg.setText("Vui lòng xác thực tài khoản bằng cách nhấn vào link: \n" + link);
+        msg.setFrom("tcp18092004@gmail.com");
 
         mailSender.send(msg);
     }
