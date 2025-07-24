@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác thực tài khoản</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #2c3e50;
+        }
+        p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 14px 24px;
+            text-decoration: none;
+            border-radius: 8px;
+            display: inline-block;
+            margin-top: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #218838;
+        }
+        .footer {
+            margin-top: 40px;
+            font-size: 13px;
+            color: #999;
+        }
+        .icon {
+            font-size: 40px;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Logo trường nếu có -->
+    <img src="https://www.senviet.art/wp-content/uploads/edd/2021/12/dai-hoc-mo-tphcm.jpg" class="logo" alt="OU Logo">
+
+    <div class="icon">📩</div>
+    <h2>Chào mừng bạn đến với OU!</h2>
+    <p>Bạn vừa tạo tài khoản tại <strong>Hệ thống Quản lý Cơ sở OU</strong>.</p>
+    <p>Hãy xác thực tài khoản của bạn bằng cách nhấn vào nút dưới đây:</p>
+
+    <a class="btn" href="{{link}}">✅ Xác thực tài khoản</a>
+
+    <p class="footer">
+        Nếu bạn không yêu cầu tạo tài khoản, bạn có thể bỏ qua email này.<br>
+        Cảm ơn bạn đã đồng hành cùng chúng tôi! 💙
+    </p>
+</div>
+</body>
+</html>
