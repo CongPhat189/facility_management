@@ -1,8 +1,10 @@
 package com.trancongphat.facility_management.service;
 
 import com.trancongphat.facility_management.dto.RegisterRequest;
+import com.trancongphat.facility_management.entity.LecturerRequest;
 import com.trancongphat.facility_management.entity.User;
 import com.trancongphat.facility_management.repository.UserRepository;
+import com.trancongphat.facility_management.repository.LecturerRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,7 @@ import java.util.UUID;
 public class UserService {
 
     @Autowired private UserRepository userRepository;
+    @Autowired private LecturerRequestRepository lecturerRequestRepository;
     @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired private EmailService emailService;
@@ -51,6 +54,29 @@ public class UserService {
 
         emailService.sendVerificationEmail(user.getEmail(), token);
     }
+    // Đăng ký GIẢNG VIÊN – Lưu yêu cầu vào bảng lecturer_requests
+    public void registerLecturer(RegisterRequest req) {
+        if (!req.getEmail().endsWith("@ou.edu.vn")) {
+            throw new IllegalArgumentException("Email phải là @ou.edu.vn");
+        }
+
+        if (userRepository.existsByEmail(req.getEmail())) {
+            throw new IllegalArgumentException("Email đã được sử dụng.");
+        }
+
+        if (lecturerRequestRepository.existsByEmail(req.getEmail())) {
+            throw new IllegalArgumentException("Email đã đăng ký yêu cầu giảng viên rồi.");
+        }
+
+        LecturerRequest lecturerRequest = new LecturerRequest();
+        lecturerRequest.setEmail(req.getEmail());
+        lecturerRequest.setFullName(req.getFullName());
+        lecturerRequest.setStatus(LecturerRequest.Status.PENDING);
+        lecturerRequest.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+
+        lecturerRequestRepository.save(lecturerRequest);
+    }
+
 
     public void verifyEmail(String token) {
         User user = userRepository.findAll().stream()

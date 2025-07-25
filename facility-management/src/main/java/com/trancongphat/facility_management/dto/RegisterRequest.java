@@ -1,6 +1,6 @@
 package com.trancongphat.facility_management.dto;
 
-import org.springframework.web.bind.annotation.RequestPart;
+import com.trancongphat.facility_management.entity.User;
 import org.springframework.web.multipart.MultipartFile;
 
 public class RegisterRequest {
@@ -9,6 +9,11 @@ public class RegisterRequest {
     private String fullName;
     private String studentId;
     private MultipartFile avatar;
+    private User.Role role;
+
+
+
+
 
     public String getPassword() {
         return password;
@@ -48,5 +53,12 @@ public class RegisterRequest {
 
     public void setAvatar(MultipartFile avatar) {
         this.avatar = avatar;
+    }
+    public User.Role getRole() {
+        return role;
+    }
+
+    public void setRole(User.Role role) {
+        this.role = role;
     }
 }
