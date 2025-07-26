@@ -18,6 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         return (UserDetails) userRepository.findByEmail(email)
+                .map(user -> new com.trancongphat.facility_management.security.CustomUserDetails(user))
                 .orElseThrow(() -> new UsernameNotFoundException("Người dùng không tồn tại"));
     }
 }

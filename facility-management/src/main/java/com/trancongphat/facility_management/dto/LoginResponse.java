@@ -1,11 +1,11 @@
 package com.trancongphat.facility_management.dto;
 
-public class LoginRespone {
+public class LoginResponse {
     private String token;
     private String role;
     private String fullName;
 
-    public LoginRespone(String token, String role, String fullName) {
+    public LoginResponse(String token, String role, String fullName) {
         this.token = token;
         this.role = role;
         this.fullName = fullName;

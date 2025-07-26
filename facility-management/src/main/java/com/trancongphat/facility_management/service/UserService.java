@@ -6,6 +6,7 @@ import com.trancongphat.facility_management.entity.User;
 import com.trancongphat.facility_management.repository.UserRepository;
 import com.trancongphat.facility_management.repository.LecturerRequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -76,7 +77,20 @@ public class UserService {
 
         lecturerRequestRepository.save(lecturerRequest);
     }
-
+//    public void createAdmin(RegisterRequest req) {
+//        if (userRepository.existsByEmail("admin@ou.edu.vn")) {
+//            throw new IllegalArgumentException("Tài khoản admin đã tồn tại.");
+//        }
+//        User admin = new User();
+//        admin.setEmail("admin@ou.edu.vn");
+//        admin.setFullName("Quản trị viên hệ thống OU");
+//        admin.setPassword(new BCryptPasswordEncoder().encode("admin123"));
+//        admin.setRole(User.Role.admin);
+//        admin.setVerified(true);
+//        admin.setStatus(User.Status.active);
+//        admin.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+//        userRepository.save(admin);
+//    }
 
     public void verifyEmail(String token) {
         User user = userRepository.findAll().stream()

@@ -32,5 +32,5 @@ cloudinary:
   api-secret: fbyd8zzUl4OSzBFxkf4_cr4jNTk
 
 jwt:
-  secret: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30
+  secret: oUwfZl+T7r7+Jw5bB65zW98Mt3jzYtPClpZ3aINxqVQ=
   expiration: 86400000 # 24 hours in milliseconds
