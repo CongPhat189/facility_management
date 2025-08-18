@@ -16,6 +16,9 @@ public class FieldBooking {
 
     @Column(name = "field_id")
     private Integer fieldId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "field_id", nullable = false)
+    private SportField field;
 
     @Column(name = "payment_required")
     private Boolean paymentRequired = false;
@@ -50,5 +53,13 @@ public class FieldBooking {
 
     public void setPaymentRequired(Boolean paymentRequired) {
         this.paymentRequired = paymentRequired;
+    }
+
+    public SportField getField() {
+        return field;
+    }
+
+    public void setField(SportField field) {
+        this.field = field;
     }
 }

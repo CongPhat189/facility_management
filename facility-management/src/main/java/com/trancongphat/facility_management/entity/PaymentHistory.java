@@ -36,6 +36,8 @@ public class PaymentHistory {
 
     @Column(columnDefinition = "TEXT", name = "notes")
     private String notes;
+
+
     public enum PaymentStatus {
         PENDING, SUCCESS, FAILED
     }

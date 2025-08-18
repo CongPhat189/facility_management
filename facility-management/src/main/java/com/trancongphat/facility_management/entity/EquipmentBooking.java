@@ -16,6 +16,9 @@ public class EquipmentBooking {
 
     @Column(name = "equipment_id")
     private Integer equipmentId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "equipment_id", nullable = false)
+    private Equipment equipment;
 
     @Column(name = "quantity")
     private Integer quantity = 1;
@@ -50,5 +53,13 @@ public class EquipmentBooking {
 
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
+    }
+
+    public Equipment getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(Equipment equipment) {
+        this.equipment = equipment;
     }
 }

@@ -1,5 +1,6 @@
 package com.trancongphat.facility_management.service;
 
+import com.trancongphat.facility_management.entity.Booking;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,5 +70,22 @@ public class EmailService {
             throw new RuntimeException("Gửi email thất bại: " + e.getMessage());
         }
 
+    }
+    public void sendBookingApprovedEmail(String toEmail, Booking booking) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(toEmail);
+        msg.setSubject("Đặt lịch đã được duyệt");
+        msg.setText("Xin chào, \n\nLịch đặt của bạn đã được phê duyệt.\n" +
+                "Chi tiết: " + booking.toString() + "\n\nTrân trọng!");
+        mailSender.send(msg);
+    }
+
+    public void sendBookingRejectedEmail(String toEmail, Booking booking, String reason) {
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(toEmail);
+        msg.setSubject("Đặt lịch đã bị từ chối");
+        msg.setText("Xin chào, \n\nLịch đặt của bạn đã bị từ chối.\n" +
+                "Lý do: " + reason + "\n\nTrân trọng!");
+        mailSender.send(msg);
     }
 }

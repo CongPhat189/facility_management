@@ -9,7 +9,7 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
-    private Integer bookingId;
+    private Long bookingId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -46,12 +46,44 @@ public class Booking {
 
     @Column(name = "payment_required")
     private Boolean paymentRequired = false;
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private ClassroomBooking classroomBooking;
 
-    public Integer getBookingId() {
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private EquipmentBooking equipmentBooking;
+
+    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
+    private FieldBooking fieldBooking;
+
+    public ClassroomBooking getClassroomBooking() {
+        return classroomBooking;
+    }
+
+    public void setClassroomBooking(ClassroomBooking classroomBooking) {
+        this.classroomBooking = classroomBooking;
+    }
+
+    public EquipmentBooking getEquipmentBooking() {
+        return equipmentBooking;
+    }
+
+    public void setEquipmentBooking(EquipmentBooking equipmentBooking) {
+        this.equipmentBooking = equipmentBooking;
+    }
+
+    public FieldBooking getFieldBooking() {
+        return fieldBooking;
+    }
+
+    public void setFieldBooking(FieldBooking fieldBooking) {
+        this.fieldBooking = fieldBooking;
+    }
+
+    public Long getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(Integer bookingId) {
+    public void setBookingId(Long bookingId) {
         this.bookingId = bookingId;
     }
 
@@ -143,7 +175,8 @@ public class Booking {
         this.paymentRequired = paymentRequired;
     }
     public enum BookingStatus {
-        PENDING, APPROVED, REJECTED, COMPLETED, CANCELLED
+        PENDING, APPROVED, REJECTED, COMPLETED, CANCELED
     }
+
 }
 

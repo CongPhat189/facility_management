@@ -31,7 +31,7 @@ public class InvoiceDetail {
     private BigDecimal unitPrice;
 
     @Column(name = "duration_hours")
-    private Double durationHours;
+    private Integer durationHours;
 
     @Column(name = "subtotal")
     private BigDecimal subtotal;
@@ -97,11 +97,11 @@ public class InvoiceDetail {
         this.unitPrice = unitPrice;
     }
 
-    public Double getDurationHours() {
+    public Integer getDurationHours(BigDecimal hours) {
         return durationHours;
     }
 
-    public void setDurationHours(Double durationHours) {
+    public void setDurationHours(BigDecimal durationHours) {
         this.durationHours = durationHours;
     }
 
@@ -112,5 +112,6 @@ public class InvoiceDetail {
     public void setSubtotal(BigDecimal subtotal) {
         this.subtotal = subtotal;
     }
+
 }
 

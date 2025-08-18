@@ -1,8 +1,10 @@
 package com.trancongphat.facility_management.service;
 
 import com.trancongphat.facility_management.dto.LecturerAccountRequest;
+import com.trancongphat.facility_management.entity.Booking;
 import com.trancongphat.facility_management.entity.LecturerRequest;
 import com.trancongphat.facility_management.entity.User;
+import com.trancongphat.facility_management.repository.BookingRepository;
 import com.trancongphat.facility_management.repository.LecturerRequestRepository;
 import com.trancongphat.facility_management.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -22,6 +24,7 @@ public class AdminService {
     @Autowired private EmailService emailService;
     @Autowired private LecturerRequestRepository lecturerRequestRepository;
     @Autowired private PasswordEncoder passwordEncoder;
+    @Autowired private BookingRepository bookingRepository;
     @Transactional
     public void approveLecturerRequest(Long requestId) {
         LecturerRequest req = lecturerRequestRepository.findById(requestId)
@@ -57,6 +60,43 @@ public class AdminService {
 
         // Gửi email tài khoản
         emailService.sendLecturerAccountInfo(req.getEmail(), defaultPassword);
+    }
+    @Transactional
+    public Booking approveBooking(Long bookingId, Integer adminUserId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != Booking.BookingStatus.PENDING) {
+            throw new RuntimeException("Booking has already been processed");
+        }
+
+        booking.setStatus(Booking.BookingStatus.APPROVED);
+        booking.setApprovedBy(adminUserId);
+        booking.setApprovedAt(LocalDateTime.now());
+        bookingRepository.save(booking);
+
+        emailService.sendBookingApprovedEmail(booking.getUser().getEmail(), booking);
+
+        return booking;
+    }
+    @Transactional
+    public Booking rejectBooking(Long bookingId, String reason, Integer adminUserId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new RuntimeException("Booking not found"));
+
+        if (booking.getStatus() != Booking.BookingStatus.PENDING) {
+            throw new RuntimeException("Booking has already been processed");
+        }
+
+        booking.setStatus(Booking.BookingStatus.REJECTED);
+        booking.setAdminNotes(reason);
+        booking.setApprovedBy(adminUserId);
+        booking.setApprovedAt(LocalDateTime.now());
+        bookingRepository.save(booking);
+
+        emailService.sendBookingRejectedEmail(booking.getUser().getEmail(), booking, reason);
+
+        return booking;
     }
 
 

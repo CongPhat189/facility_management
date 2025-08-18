@@ -166,6 +166,6 @@ public class Invoice {
         this.notes = notes;
     }
     public enum InvoiceStatus {
-        DRAFT, ISSUED, PAID, CANCELLED
+        PENDING, ISSUED, PAID, CANCELLED
     }
 }

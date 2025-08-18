@@ -16,6 +16,9 @@ public class ClassroomBooking {
 
     @Column(name = "classroom_id")
     private Integer classroomId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classroom_id", nullable = false)
+    private Classroom classroom;
 
     public Integer getBookingId() {
         return bookingId;
@@ -39,5 +42,11 @@ public class ClassroomBooking {
 
     public void setClassroomId(Integer classroomId) {
         this.classroomId = classroomId;
+    }
+    public Classroom getClassroom() {
+        return classroom;
+    }
+    public void setClassroom(Classroom classroom) {
+        this.classroom = classroom;
     }
 }
