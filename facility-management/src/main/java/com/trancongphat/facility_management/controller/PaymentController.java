@@ -10,6 +10,8 @@ import com.trancongphat.facility_management.repository.BookingRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/payments")
 public class PaymentController {
@@ -45,19 +47,22 @@ public class PaymentController {
         return ResponseEntity.ok(paymentService.toDto(inv));
     }
 
-    /** Khởi tạo thanh toán MoMo -> trả về payUrl (mock) */
     @PostMapping("/momo/create")
     public ResponseEntity<?> initMomo(@RequestParam Integer invoiceId) {
         String payUrl = paymentService.initMomoPayment(invoiceId);
-        return ResponseEntity.ok(payUrl);
+        return ResponseEntity.ok(Map.of("payUrl", payUrl));
     }
 
-    /** Callback MoMo (mock): hệ thống gọi endpoint này khi thanh toán thành công */
-    @PostMapping("/momo/callback")
-    public ResponseEntity<?> momoCallback(@RequestParam Integer invoiceId,
-                                          @RequestParam String transId,
-                                          @RequestParam(required = false) String providerResponse) {
-        Invoice inv = paymentService.confirmMomoSuccess(invoiceId, transId, providerResponse);
+    /** MoMo redirect trả về user (browser) */
+    @GetMapping("/momo/return")
+    public ResponseEntity<?> momoReturn(@RequestParam Map<String, String> allParams) {
+        return ResponseEntity.ok(allParams);
+    }
+
+    /** MoMo server gọi notify (IPN) */
+    @PostMapping("/momo/notify")
+    public ResponseEntity<?> momoNotify(@RequestParam Map<String, String> allParams) {
+        Invoice inv = paymentService.handleMomoNotify(allParams);
         return ResponseEntity.ok(paymentService.toDto(inv));
     }
 }
