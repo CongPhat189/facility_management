@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     // Tìm kiếm theo ID
-    Optional<Invoice> findById(Long id);
+    Optional<Invoice> findById(Integer id);
     // Custom query nếu cần
 }

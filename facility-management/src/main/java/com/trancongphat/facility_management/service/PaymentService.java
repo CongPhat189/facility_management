@@ -3,19 +3,15 @@ package com.trancongphat.facility_management.service;
 import com.trancongphat.facility_management.dto.InvoiceResponseDTO;
 import com.trancongphat.facility_management.entity.*;
 import com.trancongphat.facility_management.repository.*;
-import com.trancongphat.facility_management.util.HmacSHA256Util;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-
+import org.springframework.http.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class PaymentService {
@@ -23,170 +19,158 @@ public class PaymentService {
     private final InvoiceRepository invoiceRepo;
     private final PaymentMethodRepository methodRepo;
     private final PaymentHistoryRepository historyRepo;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate rest = new RestTemplate();
 
-    @Value("${momo.partnerCode}")
-    private String partnerCode;
-    @Value("${momo.accessKey}")
-    private String accessKey;
-    @Value("${momo.secretKey}")
-    private String secretKey;
-    @Value("${momo.endpoint}")
-    private String endpoint;
-    @Value("${momo.redirectUrl}")
-    private String redirectUrl;
-    @Value("${momo.ipnUrl}")
-    private String ipnUrl;
-    @Value("${momo.requestType}")
-    private String requestType;
+    // MoMo config (in application.yml)
+    private final String momoEndpoint;
+    private final String momoPartnerCode;
+    private final String momoAccessKey;
+    private final String momoSecretKey;
+    private final String momoReturnUrl;
+    private final String momoNotifyUrl;
 
     public PaymentService(InvoiceRepository invoiceRepo,
                           PaymentMethodRepository methodRepo,
-                          PaymentHistoryRepository historyRepo) {
+                          PaymentHistoryRepository historyRepo,
+                          org.springframework.core.env.Environment env) {
         this.invoiceRepo = invoiceRepo;
         this.methodRepo = methodRepo;
         this.historyRepo = historyRepo;
+        this.momoEndpoint = env.getProperty("momo.endpoint");
+        this.momoPartnerCode = env.getProperty("momo.partnerCode");
+        this.momoAccessKey = env.getProperty("momo.accessKey");
+        this.momoSecretKey = env.getProperty("momo.secretKey");
+        this.momoReturnUrl = env.getProperty("momo.returnUrl");
+        this.momoNotifyUrl = env.getProperty("momo.notifyUrl");
     }
 
     @Transactional
     public Invoice payCash(Integer invoiceId, String payerInfo) {
-        Invoice invoice = invoiceRepo.findById(Long.valueOf(invoiceId))
+        Invoice inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
-
-        if (invoice.getStatus() == Invoice.InvoiceStatus.PAID) return invoice;
+        if (inv.getStatus() == Invoice.InvoiceStatus.PAID) return inv;
 
         PaymentMethod cash = methodRepo.findByMethodNameIgnoreCase("CASH")
-                .orElseThrow(() -> new IllegalStateException("Payment method CASH not found"));
+                .orElseThrow(() -> new IllegalStateException("CASH method not found"));
 
-        invoice.setPaymentMethodId(cash.getMethodId());
-        invoice.setStatus(Invoice.InvoiceStatus.PAID);
-        invoice.setPaidAt(LocalDateTime.now());
-        invoiceRepo.save(invoice);
+        inv.setPaymentMethodId(cash.getMethodId());
+        inv.setStatus(Invoice.InvoiceStatus.PAID);
+        inv.setPaidAt(LocalDateTime.now());
+        invoiceRepo.save(inv);
 
         PaymentHistory his = new PaymentHistory();
-        his.setInvoice(invoice);
-        his.setAmount(invoice.getFinalAmount());
-        his.setPaymentId( cash.getMethodId());
+        his.setInvoice(inv);
+        his.setAmount(inv.getFinalAmount());
+        his.setPaymentMethodId(cash.getMethodId());
         his.setPaymentDate(LocalDateTime.now());
         his.setPayerInfo(payerInfo);
         his.setStatus(PaymentHistory.PaymentStatus.SUCCESS);
         historyRepo.save(his);
 
-        return invoice;
+        return inv;
     }
 
-    /** Khởi tạo thanh toán MoMo */
+    // Create momo payment - return payUrl for frontend redirection
     public String initMomoPayment(Integer invoiceId) {
-        Invoice invoice = invoiceRepo.findById(Long.valueOf(invoiceId))
+        Invoice inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
 
-        String orderId = UUID.randomUUID().toString();
         String requestId = UUID.randomUUID().toString();
-        String amount = invoice.getFinalAmount().toBigInteger().toString();
+        String orderId = "INV-" + invoiceId + "-" + System.currentTimeMillis();
+        String amount = inv.getFinalAmount().setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(); // momo often requires integer
+        String orderInfo = "Payment for invoice " + invoiceId;
 
-        String rawData = "accessKey=" + accessKey +
+        Map<String, String> params = new HashMap<>();
+        params.put("partnerCode", momoPartnerCode);
+        params.put("accessKey", momoAccessKey);
+        params.put("requestId", requestId);
+        params.put("amount", amount);
+        params.put("orderId", orderId);
+        params.put("orderInfo", orderInfo);
+        params.put("returnUrl", momoReturnUrl);
+        params.put("notifyUrl", momoNotifyUrl);
+        params.put("extraData", "");
+        params.put("requestType", "captureWallet");
+
+        // create signature: rawString = "accessKey=...&amount=...&..."
+        String rawSignature = "accessKey=" + momoAccessKey +
                 "&amount=" + amount +
-                "&extraData=" +
-                "&ipnUrl=" + ipnUrl +
+                "&extraData=" + "" +
                 "&orderId=" + orderId +
-                "&orderInfo=Pay invoice " + invoiceId +
-                "&partnerCode=" + partnerCode +
-                "&redirectUrl=" + redirectUrl +
+                "&orderInfo=" + orderInfo +
+                "&partnerCode=" + momoPartnerCode +
                 "&requestId=" + requestId +
-                "&requestType=" + requestType;
+                "&requestType=captureWallet";
 
-        String signature = HmacSHA256Util.sign(rawData, secretKey);
+        String signature = hmacSHA256(rawSignature, momoSecretKey);
+        params.put("signature", signature);
 
-        Map<String, Object> payload = new HashMap<>();
-        payload.put("partnerCode", partnerCode);
-        payload.put("accessKey", accessKey);
-        payload.put("requestId", requestId);
-        payload.put("amount", amount);
-        payload.put("orderId", orderId);
-        payload.put("orderInfo", "Pay invoice " + invoiceId);
-        payload.put("redirectUrl", redirectUrl);
-        payload.put("ipnUrl", ipnUrl);
-        payload.put("extraData", "");
-        payload.put("requestType", requestType);
-        payload.put("signature", signature);
-        payload.put("lang", "en");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, String>> request = new HttpEntity<>(params, headers);
 
-        ResponseEntity<Map> res = restTemplate.postForEntity(endpoint, payload, Map.class);
-        if (res.getStatusCode().is2xxSuccessful()) {
-            return res.getBody().get("payUrl").toString();
-        }
-        throw new RuntimeException("MoMo API error: " + res);
+        Map resp = rest.postForObject(momoEndpoint, request, Map.class);
+        if (resp == null) throw new IllegalStateException("MoMo no response");
+
+        // MoMo response contains payUrl or payUrl
+        Object payUrl = resp.get("payUrl");
+        if (payUrl == null) throw new IllegalStateException("MoMo payUrl absent: " + resp);
+        return payUrl.toString();
     }
 
-    /** Xử lý notify từ MoMo */
+    private String hmacSHA256(String data, String key) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(key.getBytes("UTF-8"), "HmacSHA256"));
+            byte[] rawHmac = mac.doFinal(data.getBytes("UTF-8"));
+            StringBuilder sb = new StringBuilder(2 * rawHmac.length);
+            for (byte b : rawHmac) {
+                sb.append(String.format("%02x", b & 0xff));
+            }
+            return sb.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("Failed to generate HMAC SHA256", ex);
+        }
+    }
+
     @Transactional
-    public Invoice handleMomoNotify(Map<String, String> momoParams) {
-        String rawData = "accessKey=" + accessKey +
-                "&amount=" + momoParams.get("amount") +
-                "&extraData=" + momoParams.get("extraData") +
-                "&message=" + momoParams.get("message") +
-                "&orderId=" + momoParams.get("orderId") +
-                "&orderInfo=" + momoParams.get("orderInfo") +
-                "&orderType=" + momoParams.get("orderType") +
-                "&partnerCode=" + momoParams.get("partnerCode") +
-                "&payType=" + momoParams.get("payType") +
-                "&requestId=" + momoParams.get("requestId") +
-                "&responseTime=" + momoParams.get("responseTime") +
-                "&resultCode=" + momoParams.get("resultCode") +
-                "&transId=" + momoParams.get("transId");
-
-        String expectedSig = HmacSHA256Util.sign(rawData, secretKey);
-        if (!expectedSig.equals(momoParams.get("signature"))) {
-            throw new RuntimeException("Invalid MoMo signature");
-        }
-
-        // Chỉ khi resultCode == 0 mới coi là thành công
-        if (!"0".equals(momoParams.get("resultCode"))) {
-            throw new RuntimeException("MoMo payment failed: " + momoParams.get("message"));
-        }
-
-        // Lấy invoiceId từ orderInfo hoặc extraData
-        String orderInfo = momoParams.get("orderInfo");
-        Integer invoiceId = Integer.valueOf(orderInfo.replace("Pay invoice ", ""));
-        Invoice invoice = invoiceRepo.findById(Long.valueOf(invoiceId))
+    public Invoice confirmMomo(String invoiceIdStr, String momoTransId, String providerResponse) {
+        Integer invoiceId = Math.toIntExact(Long.valueOf(invoiceIdStr));
+        Invoice inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
-
         PaymentMethod momo = methodRepo.findByMethodNameIgnoreCase("MOMO")
-                .orElseThrow(() -> new IllegalStateException("Payment method MOMO not found"));
+                .orElseThrow(() -> new IllegalStateException("MOMO method missing"));
 
-        invoice.setPaymentMethodId(momo.getMethodId());
-        invoice.setTransactionId(momoParams.get("transId"));
-        invoice.setStatus(Invoice.InvoiceStatus.PAID);
-        invoice.setPaidAt(LocalDateTime.now());
-        invoiceRepo.save(invoice);
+        inv.setPaymentMethodId(momo.getMethodId());
+        inv.setTransactionId(momoTransId);
+        inv.setStatus(Invoice.InvoiceStatus.PAID);
+        inv.setPaidAt(LocalDateTime.now());
+        invoiceRepo.save(inv);
 
         PaymentHistory his = new PaymentHistory();
-        his.setInvoice(invoice);
-        his.setAmount(invoice.getFinalAmount());
-        his.setPaymentId(momo.getMethodId());
-        his.setTransactionId(momoParams.get("transId"));
+        his.setInvoice(inv);
+        his.setAmount(inv.getFinalAmount());
+        his.setPaymentMethodId(momo.getMethodId());
+        his.setTransactionId(momoTransId);
         his.setPaymentDate(LocalDateTime.now());
         his.setStatus(PaymentHistory.PaymentStatus.SUCCESS);
         historyRepo.save(his);
 
-        return invoice;
+        return inv;
     }
 
-    /* Helper trả DTO đẹp (nếu bạn muốn dùng) */
     public InvoiceResponseDTO toDto(Invoice inv) {
         InvoiceResponseDTO dto = new InvoiceResponseDTO();
-        dto.setInvoiceId(inv.getInvoiceId());
+        dto.setInvoiceId(Math.toIntExact(inv.getInvoiceId()));
         dto.setBookingId(inv.getBooking() != null ? inv.getBooking().getBookingId() : null);
         dto.setUserId(inv.getUser() != null ? inv.getUser().getUserId() : null);
         dto.setTotalAmount(inv.getTotalAmount());
         dto.setDiscount(inv.getDiscount());
-        dto.setTax(inv.getTax());
         dto.setFinalAmount(inv.getFinalAmount());
-        dto.setStatus(inv.getStatus() != null ? inv.getStatus().name() : null);
+        dto.setStatus(inv.getStatus().name());
         dto.setIssuedAt(inv.getIssuedAt());
         dto.setPaidAt(inv.getPaidAt());
         dto.setTransactionId(inv.getTransactionId());
-        // details nếu cần -> load qua InvoiceService.getDetails(...)
         return dto;
     }
 }

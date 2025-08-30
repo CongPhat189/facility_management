@@ -2,10 +2,7 @@ package com.trancongphat.facility_management.controller;
 
 import com.trancongphat.facility_management.dto.ClassroomRequestDTO;
 import com.trancongphat.facility_management.dto.ClassroomResponseDTO;
-import com.trancongphat.facility_management.dto.EquipmentRequestDTO;
-import com.trancongphat.facility_management.dto.EquipmentResponseDTO;
-import com.trancongphat.facility_management.entity.Classroom;
-import com.trancongphat.facility_management.mapper.ClassroomMapper;
+
 import com.trancongphat.facility_management.service.ClassroomService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,7 @@ import java.util.List;
 
 @PreAuthorize( "hasRole('ROLE_ADMIN')")
 @RestController
-@RequestMapping("/admin/classrooms")
+@RequestMapping("api/admin/classrooms")
 public class ClassroomController {
 
     @Autowired

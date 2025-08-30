@@ -16,7 +16,7 @@ import java.util.List;
 
 @PreAuthorize("hasRole('ROLE_ADMIN')")
 @RestController
-@RequestMapping("/admin/equipments")
+@RequestMapping("api/admin/equipments")
 public class EquipmentController {
 
     @Autowired

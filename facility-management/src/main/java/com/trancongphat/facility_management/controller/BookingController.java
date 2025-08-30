@@ -32,7 +32,7 @@ public class BookingController {
      * Lấy thông tin 1 booking theo ID
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Booking>> getBooking(@PathVariable Long id) {
+    public ResponseEntity<Optional<Booking>> getBooking(@PathVariable Integer id) {
         Optional<Booking> booking = bookingService.findById(id);
         return ResponseEntity.ok(booking);
     }
@@ -50,8 +50,9 @@ public class BookingController {
      * User hủy booking
      */
     @PostMapping("/cancel/{id}")
-    public ResponseEntity<String> cancelBooking(@PathVariable Long id, @RequestParam Integer userId) {
+    public ResponseEntity<String> cancelBooking(@PathVariable Integer id, @RequestParam Integer userId) {
         bookingService.cancelBooking(id, userId);
         return ResponseEntity.ok("Đã hủy booking thành công");
     }
+
 }

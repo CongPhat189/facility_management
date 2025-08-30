@@ -31,7 +31,7 @@ public class InvoiceDetail {
     private BigDecimal unitPrice;
 
     @Column(name = "duration_hours")
-    private Integer durationHours;
+    private BigDecimal durationHours;
 
     @Column(name = "subtotal")
     private BigDecimal subtotal;
@@ -97,7 +97,7 @@ public class InvoiceDetail {
         this.unitPrice = unitPrice;
     }
 
-    public Integer getDurationHours(BigDecimal hours) {
+    public BigDecimal getDurationHours(BigDecimal hours) {
         return durationHours;
     }
 

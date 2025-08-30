@@ -1,6 +1,8 @@
 package com.trancongphat.facility_management.entity;
 
 import jakarta.persistence.*;
+
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,13 +11,20 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "booking_id")
-    private Long bookingId;
+    private Integer bookingId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "resource_type")
+    @Enumerated(EnumType.STRING)
+    private ResourceType resourceType; // CLASSROOM, SPORT_FIELD, EQUIPMENT
+
+    @Column(name = "resource_id")
+    private Integer resourceId; // id of classroom/field/equipment
+
+    @Column(name = "purpose", columnDefinition = "TEXT")
     private String purpose;
 
     @Column(name = "start_time")
@@ -25,17 +34,16 @@ public class Booking {
     private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private BookingStatus status;
+    private BookingStatus status = BookingStatus.PENDING;
+
+    @Column(name = "payment_required")
+    private Boolean paymentRequired = false;
 
     @Column(name = "admin_notes", columnDefinition = "TEXT")
     private String adminNotes;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     @Column(name = "approved_by")
-    private Integer approvedBy; // admin user id
+    private Integer approvedBy;
 
     @Column(name = "approved_at")
     private LocalDateTime approvedAt;
@@ -43,47 +51,15 @@ public class Booking {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    public enum ResourceType { CLASSROOM, SPORT_FIELD, EQUIPMENT }
 
-    @Column(name = "payment_required")
-    private Boolean paymentRequired = false;
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private ClassroomBooking classroomBooking;
+    public enum BookingStatus { PENDING, APPROVED, REJECTED, CANCELLED, COMPLETED}
 
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private EquipmentBooking equipmentBooking;
-
-    @OneToOne(mappedBy = "booking", cascade = CascadeType.ALL)
-    private FieldBooking fieldBooking;
-
-    public ClassroomBooking getClassroomBooking() {
-        return classroomBooking;
-    }
-
-    public void setClassroomBooking(ClassroomBooking classroomBooking) {
-        this.classroomBooking = classroomBooking;
-    }
-
-    public EquipmentBooking getEquipmentBooking() {
-        return equipmentBooking;
-    }
-
-    public void setEquipmentBooking(EquipmentBooking equipmentBooking) {
-        this.equipmentBooking = equipmentBooking;
-    }
-
-    public FieldBooking getFieldBooking() {
-        return fieldBooking;
-    }
-
-    public void setFieldBooking(FieldBooking fieldBooking) {
-        this.fieldBooking = fieldBooking;
-    }
-
-    public Long getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(Long bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 
@@ -93,6 +69,22 @@ public class Booking {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public ResourceType getResourceType() {
+        return resourceType;
+    }
+
+    public void setResourceType(ResourceType resourceType) {
+        this.resourceType = resourceType;
+    }
+
+    public Integer getResourceId() {
+        return resourceId;
+    }
+
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
     }
 
     public String getPurpose() {
@@ -127,20 +119,20 @@ public class Booking {
         this.status = status;
     }
 
+    public Boolean getPaymentRequired() {
+        return paymentRequired;
+    }
+
+    public void setPaymentRequired(Boolean paymentRequired) {
+        this.paymentRequired = paymentRequired;
+    }
+
     public String getAdminNotes() {
         return adminNotes;
     }
 
     public void setAdminNotes(String adminNotes) {
         this.adminNotes = adminNotes;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Integer getApprovedBy() {
@@ -166,17 +158,4 @@ public class Booking {
     public void setCompletedAt(LocalDateTime completedAt) {
         this.completedAt = completedAt;
     }
-
-    public Boolean getPaymentRequired() {
-        return paymentRequired;
-    }
-
-    public void setPaymentRequired(Boolean paymentRequired) {
-        this.paymentRequired = paymentRequired;
-    }
-    public enum BookingStatus {
-        PENDING, APPROVED, REJECTED, COMPLETED, CANCELED
-    }
-
 }
-

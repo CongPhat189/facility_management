@@ -62,7 +62,7 @@ public class AdminService {
         emailService.sendLecturerAccountInfo(req.getEmail(), defaultPassword);
     }
     @Transactional
-    public Booking approveBooking(Long bookingId, Integer adminUserId) {
+    public Booking approveBooking(Integer bookingId, Integer adminUserId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
@@ -80,7 +80,7 @@ public class AdminService {
         return booking;
     }
     @Transactional
-    public Booking rejectBooking(Long bookingId, String reason, Integer adminUserId) {
+    public Booking rejectBooking(Integer bookingId, String reason, Integer adminUserId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 

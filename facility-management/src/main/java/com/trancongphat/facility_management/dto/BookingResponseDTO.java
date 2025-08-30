@@ -1,76 +1,39 @@
 package com.trancongphat.facility_management.dto;
 
-import com.trancongphat.facility_management.entity.Booking;
-
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 public class BookingResponseDTO {
-    private Long bookingId;
-    private Integer userId;
-    private Integer classroomId;
-    private Integer fieldId;
-    private Integer equipmentId;
-    private Integer equipmentQuantity;
-    private String purpose;
+    private Integer bookingId;
+    private String resourceType;
+    private Integer resourceId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private String status;
-    private boolean paymentRequired;
+    private String purpose;
 
-    public Long getBookingId() {
+    public Integer getBookingId() {
         return bookingId;
     }
 
-    public void setBookingId(Long bookingId) {
+    public void setBookingId(Integer bookingId) {
         this.bookingId = bookingId;
     }
 
-    public Integer getUserId() {
-        return userId;
+    public String getResourceType() {
+        return resourceType;
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
     }
 
-    public Integer getClassroomId() {
-        return classroomId;
+    public Integer getResourceId() {
+        return resourceId;
     }
 
-    public void setClassroomId(Integer classroomId) {
-        this.classroomId = classroomId;
-    }
-
-    public Integer getFieldId() {
-        return fieldId;
-    }
-
-    public void setFieldId(Integer fieldId) {
-        this.fieldId = fieldId;
-    }
-
-    public Integer getEquipmentId() {
-        return equipmentId;
-    }
-
-    public void setEquipmentId(Integer equipmentId) {
-        this.equipmentId = equipmentId;
-    }
-
-    public Integer getEquipmentQuantity() {
-        return equipmentQuantity;
-    }
-
-    public void setEquipmentQuantity(Integer equipmentQuantity) {
-        this.equipmentQuantity = equipmentQuantity;
-    }
-
-    public String getPurpose() {
-        return purpose;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
     }
 
     public LocalDateTime getStartTime() {
@@ -96,23 +59,12 @@ public class BookingResponseDTO {
     public void setStatus(String status) {
         this.status = status;
     }
-    public boolean isPaymentRequired() {
-        return paymentRequired;
-    }
-    public void setPaymentRequired(boolean paymentRequired) {
-        this.paymentRequired = paymentRequired;
-    }
-    public static BookingResponseDTO fromEntity(Booking b) {
-        BookingResponseDTO dto = new BookingResponseDTO();
-        dto.setBookingId(b.getBookingId());
-        dto.setUserId(b.getUser() != null ? b.getUser().getUserId() : null);
-        dto.setPurpose(b.getPurpose());
-        dto.setStartTime(b.getStartTime());
-        dto.setEndTime(b.getEndTime());
-        dto.setStatus(b.getStatus() != null ? b.getStatus().name() : null);
 
-        return dto;
+    public String getPurpose() {
+        return purpose;
     }
 
-
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
 }

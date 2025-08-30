@@ -19,7 +19,7 @@ import java.util.List;
 
 @PreAuthorize( "hasRole('ROLE_ADMIN')")
 @RestController
-@RequestMapping("/admin/sport_fields")
+@RequestMapping("api/admin/sport_fields")
 public class SportFieldController {
     @Autowired
     private SportFieldService sportFieldService;

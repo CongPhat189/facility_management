@@ -1,20 +1,16 @@
 package com.trancongphat.facility_management.dto;
 
-import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 
 public class CreateBookingRequest {
-    private Integer userId;
-    private Integer classroomId;    // optional
-    private Integer fieldId;        // optional
-    private Integer equipmentId;    // optional
-    private Integer equipmentQuantity; // optional for equipment
-    private String purpose;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Integer userId;                // id user đặt
+    private String resourceType;        // CLASSROOM | SPORT_FIELD | EQUIPMENT
+    private Integer resourceId;            // id của classroom/field/equipment
     private LocalDateTime startTime;
-    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     private LocalDateTime endTime;
-    private Integer promotionId; // optional promo code id
+    private String purpose;
+    private Integer equipmentQuantity;  // nếu mượn equipment
+    private Integer promotionId;           // optional
 
     public Integer getUserId() {
         return userId;
@@ -24,44 +20,20 @@ public class CreateBookingRequest {
         this.userId = userId;
     }
 
-    public Integer getClassroomId() {
-        return classroomId;
+    public String getResourceType() {
+        return resourceType;
     }
 
-    public void setClassroomId(Integer classroomId) {
-        this.classroomId = classroomId;
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
     }
 
-    public Integer getFieldId() {
-        return fieldId;
+    public Integer getResourceId() {
+        return resourceId;
     }
 
-    public void setFieldId(Integer fieldId) {
-        this.fieldId = fieldId;
-    }
-
-    public Integer getEquipmentId() {
-        return equipmentId;
-    }
-
-    public void setEquipmentId(Integer equipmentId) {
-        this.equipmentId = equipmentId;
-    }
-
-    public Integer getEquipmentQuantity() {
-        return equipmentQuantity;
-    }
-
-    public void setEquipmentQuantity(Integer equipmentQuantity) {
-        this.equipmentQuantity = equipmentQuantity;
-    }
-
-    public String getPurpose() {
-        return purpose;
-    }
-
-    public void setPurpose(String purpose) {
-        this.purpose = purpose;
+    public void setResourceId(Integer resourceId) {
+        this.resourceId = resourceId;
     }
 
     public LocalDateTime getStartTime() {
@@ -78,6 +50,22 @@ public class CreateBookingRequest {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public String getPurpose() {
+        return purpose;
+    }
+
+    public void setPurpose(String purpose) {
+        this.purpose = purpose;
+    }
+
+    public Integer getEquipmentQuantity() {
+        return equipmentQuantity;
+    }
+
+    public void setEquipmentQuantity(Integer equipmentQuantity) {
+        this.equipmentQuantity = equipmentQuantity;
     }
 
     public Integer getPromotionId() {
