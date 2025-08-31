@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 public class BookingService {
 
@@ -90,6 +92,7 @@ public class BookingService {
         }).toList();
     }
 
+
     //cancel booking
     @Transactional
     public void cancelBooking(Integer bookingId, Integer userId) {
@@ -105,4 +108,6 @@ public class BookingService {
     public java.util.Optional<Booking> findById(Integer id) {
         return bookingRepo.findById(id);
     }
+
+
 }

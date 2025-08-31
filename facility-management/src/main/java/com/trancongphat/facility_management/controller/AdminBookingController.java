@@ -41,4 +41,15 @@ public class AdminBookingController {
                                  @RequestParam Integer adminId) {
         return adminService.rejectBooking(id, reason, adminId);
     }
+    // Admin lấy danh sach tất cả booking
+    @GetMapping
+    public List<Booking> getAllBookings() {
+        return bookingRepo.findAll();
+    }
+    // Admin lấy thông tin chi tiết booking theo ID
+    @GetMapping("/{id}")
+    public Booking getBookingById(@PathVariable Integer id) {
+        return bookingRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
+    }
 }

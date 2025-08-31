@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Integer> {
     List<Booking> findByUserUserId(Integer userId);
@@ -19,4 +20,5 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             "and b.status <> com.trancongphat.facility_management.entity.Booking.BookingStatus.CANCELLED " +
             "and b.startTime < ?4 and b.endTime > ?3")
     boolean existsOverlap(Booking.ResourceType resourceType, Integer resourceId, LocalDateTime start, LocalDateTime end);
+
 }

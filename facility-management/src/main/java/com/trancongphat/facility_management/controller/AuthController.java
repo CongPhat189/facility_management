@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.trancongphat.facility_management.repository.UserRepository;
 
@@ -46,20 +48,29 @@ public class AuthController {
     public ResponseEntity<?> register(@ModelAttribute RegisterRequest req) {
         try {
             userService.registerStudent(req);
-            return ResponseEntity.ok("Đăng ký thành công. Vui lòng kiểm tra email để xác thực.");
+            return ResponseEntity.ok(Map.of("message", "Đăng ký thành công. Vui lòng kiểm tra email để xác thực."));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
     @PostMapping("/register/lecturer")
     public ResponseEntity<?> registerLecturer(@RequestBody RegisterRequest request) {
         try {
             userService.registerLecturer(request);
-            return ResponseEntity.ok("Đăng ký giảng viên thành công. Vui lòng kiểm tra email.");
+
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Đăng ký giảng viên thành công. Vui lòng kiểm tra email để xác thực tài khoản!");
+
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            Map<String, String> error = new HashMap<>();
+            error.put("error", e.getMessage());
+
+            return ResponseEntity.badRequest().body(error);
         }
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {

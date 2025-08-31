@@ -21,13 +21,14 @@ public class PaymentService {
     private final PaymentHistoryRepository historyRepo;
     private final RestTemplate rest = new RestTemplate();
 
-    // MoMo config (in application.yml)
+
     private final String momoEndpoint;
     private final String momoPartnerCode;
     private final String momoAccessKey;
     private final String momoSecretKey;
     private final String momoReturnUrl;
     private final String momoNotifyUrl;
+    private final String momoRequestType = "captureWallet";
 
     public PaymentService(InvoiceRepository invoiceRepo,
                           PaymentMethodRepository methodRepo,
@@ -37,11 +38,11 @@ public class PaymentService {
         this.methodRepo = methodRepo;
         this.historyRepo = historyRepo;
         this.momoEndpoint = env.getProperty("momo.endpoint");
-        this.momoPartnerCode = env.getProperty("momo.partnerCode");
-        this.momoAccessKey = env.getProperty("momo.accessKey");
-        this.momoSecretKey = env.getProperty("momo.secretKey");
-        this.momoReturnUrl = env.getProperty("momo.returnUrl");
-        this.momoNotifyUrl = env.getProperty("momo.notifyUrl");
+        this.momoPartnerCode = env.getProperty("momo.partner-code");
+        this.momoAccessKey = env.getProperty("momo.access-key");
+        this.momoSecretKey = env.getProperty("momo.secret-key");
+        this.momoReturnUrl = env.getProperty("momo.return-url");
+        this.momoNotifyUrl = env.getProperty("momo.notify-url");
     }
 
     @Transactional
