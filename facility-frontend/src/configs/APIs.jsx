@@ -1,0 +1,79 @@
+import axios from "axios"
+import cookie from "react-cookies"
+
+export const BASE_URL = 'http://localhost:8080/api/'
+
+export const endpoints = {
+    // APIs for auth
+    'register_student': '/auth/register/student',
+    'register_lecturer': '/auth/register/lecturer',
+    'login': '/auth/login',
+
+
+    // 'current-user': 'auth/me',
+    // 'update-user': '/secure/update-profile',
+
+
+    // APIs for user
+    'classrooms': '/user/classrooms',
+    'classroom-details': (classroomId) => `/user/classrooms/${classroomId}`,
+    'sport_fields': '/user/sport-fields',
+    'sport_field-details': (sportFieldId) => `/user/sport-fields/${sportFieldId}`,
+    'equipments': '/user/equipments',
+    'equipment-details': (equipmentId) => `/user/equipments/${equipmentId}`,
+    'bookings': '/bookings',
+    'boooking-details': (bookingId) => `/bookings/${bookingId}`,
+    'create-booking': '/bookings/create',
+    'cancel-booking': (bookingId) => `/bookings/cancel/${bookingId}`,
+
+
+
+
+    // APIs for Momo
+    'retuernURL': '/api/payment/momo/return',
+
+
+    // APIs for admin
+    'createClassroom': '/admin/classrooms/',
+    'updateClassroom': (classroomId) => `/admin/classrooms/${classroomId}`,
+    'deleteClassroom': (classroomId) => `/admin/classrooms/${classroomId}`,
+    'getClassrooms': '/admin/classrooms/',
+    'getClassroomDetails': (classroomId) => `/admin/classrooms/${classroomId}`,
+    'createSportField': '/admin/sport-fields/',
+    'updateSportField': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
+    'deleteSportField': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
+    'getSportFields': '/admin/sport-fields/',
+    'getSportField-details': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
+    'createEquipment': '/admin/equipments/',
+    'updateEquipment': (equipmentId) => `/admin/equipments/${equipmentId}`,
+    'deleteEquipment': (equipmentId) => `/admin/equipments/${equipmentId}`,
+    'getEquipments': '/admin/equipments/',
+    'getEquipment-details': (equipmentId) => `/admin/equipments/${equipmentId}`,
+    'getPendingBookings': '/admin/bookings/pending',
+    'approveBooking': (bookingId) => `/admin/bookings/${bookingId}/approve`,
+    'rejectBooking': (bookingId) => `/admin/bookings/${bookingId}/reject`,
+    'getAllBookings': '/admin/bookings',
+    'getBookingDetails': (bookingId) => `/admin/bookings/${bookingId}`,
+
+
+
+
+
+}
+
+
+export const authAPIs = () => {
+    const token = cookie.load("jwtToken");
+    return axios.create({
+        baseURL: BASE_URL,
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+}
+
+
+
+export default axios.create({
+    baseURL: BASE_URL
+});
