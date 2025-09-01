@@ -1,25 +1,42 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import StudentRegister from './pages/StudentRegister';
 import LecturerRequest from './pages/LecturerRequest';
-import { AuthProvider } from './context/AuthProvider';
+import { AuthProvider, useAuth } from './context/AuthProvider';
+import Dashboard from './pages/Dashboard';
 
-// import toastify
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
+
 function App() {
+  function PrivateRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (loading) return <div>Loading...</div>;
+
+    return user ? children : <Navigate to="/login" replace />;
+  }
   return (
     <AuthProvider>
-      <Router>
+      <BrowserRouter>
         <div className="App">
           <Routes>
-            <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register-student" element={<StudentRegister />} />
             <Route path="/request-lecturer" element={<LecturerRequest />} />
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/dashboard"
+              element={
+                <PrivateRoute>
+                  <Dashboard />
+                </PrivateRoute>
+              }
+            />
           </Routes>
 
           <ToastContainer
@@ -35,7 +52,7 @@ function App() {
             theme="colored"
           />
         </div>
-      </Router>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

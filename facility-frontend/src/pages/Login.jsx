@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthProvider';
 import APIs, { endpoints } from '../configs/APIs';
 import Input from '../components/ui/Input';
 import Button from '../components/common/Button';
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const [userType, setUserType] = useState('student');
@@ -12,29 +13,31 @@ const Login = () => {
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
 
-    const { login } = useAuth(); // lấy hàm login từ context
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // gọi API login tới backend
             const res = await APIs.post(endpoints.login, {
                 email,
                 password,
-                role: userType.toUpperCase(), // tuỳ backend bạn nhận 'STUDENT'/'LECTURER'
+                role: userType,
             });
 
-            // backend trả về token + userData
             const token = res.data.token;
-            const userData = res.data.user;
+            const userData = {
+                name: res.data.fullName,
+                role: res.data.role,
+                avatar: res.data.avatar
+            };
 
-            // gọi hàm login của context để lưu token + user
             login(userData, token);
-
-            navigate('/');
+            navigate('/dashboard');
+            toast.success("Đăng nhập thành công 🎉");
+            navigate('/dashboard');
         } catch (err) {
             console.error('Đăng nhập thất bại:', err);
-            alert("Sai email hoặc mật khẩu!");
+            toast.error("❌ Sai email hoặc mật khẩu!");
         }
     };
 
@@ -51,13 +54,12 @@ const Login = () => {
                         Đăng nhập để sử dụng dịch vụ
                     </p>
 
-                    {/* Chọn loại user */}
                     <div className="flex mb-6 bg-gray-100 rounded-lg p-1">
                         <button
                             type="button"
                             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${userType === 'student'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
+                                ? 'bg-white text-blue-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-800'
                                 }`}
                             onClick={() => setUserType('student')}
                         >
@@ -66,8 +68,8 @@ const Login = () => {
                         <button
                             type="button"
                             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${userType === 'lecturer'
-                                    ? 'bg-white text-blue-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-800'
+                                ? 'bg-white text-blue-600 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-800'
                                 }`}
                             onClick={() => setUserType('lecturer')}
                         >
@@ -75,7 +77,6 @@ const Login = () => {
                         </button>
                     </div>
 
-                    {/* Form login */}
                     <form onSubmit={handleSubmit}>
                         <div className="space-y-4">
                             <label className="block text-gray-700 mb-2" htmlFor="email">

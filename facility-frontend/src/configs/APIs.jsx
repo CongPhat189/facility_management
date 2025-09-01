@@ -10,7 +10,7 @@ export const endpoints = {
     'login': '/auth/login',
 
 
-    // 'current-user': 'auth/me',
+    'current-user': '/user/current-user',
     // 'update-user': '/secure/update-profile',
 
 

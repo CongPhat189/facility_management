@@ -11,7 +11,7 @@ const Home = () => {
     const services = [
         {
             title: "Mượn Phòng Học",
-            description: "Đăng ký mượn phòng học cho các hoạt động học tập và nghiên cứu",
+            description: "Đăng ký mượn phòng học cho các hoạt động học tập",
             icon: (
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path d="M4 19V6a2 2 0 012-2h12a2 2 0 012 2v13a2 2 0 01-2 2H6a2 2 0 01-2-2z" strokeWidth="2" fill="currentColor" fillOpacity="0.1" strokeLinejoin="round" />

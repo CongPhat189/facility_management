@@ -1,18 +1,23 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { authAPIs, endpoints } from '../configs/APIs';
-import cookie from "react-cookies"
+import cookie from "react-cookies";
 
 const AuthContext = createContext();
 
-const AuthProvider = ({ children }) => {
+export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     const login = (userData, token) => {
+        // Lưu token vào cookie
         cookie.save('jwtToken', token, { path: '/' });
         console.log("Token:", token);
+
+        // Thiết lập header mặc định cho axios
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+
+        // Lưu thông tin user vào context
         setUser(userData);
     };
 
@@ -29,10 +34,16 @@ const AuthProvider = ({ children }) => {
             setLoading(false);
             return;
         }
+
         try {
             const response = await authAPIs().get(endpoints['current-user']);
-            setUser(response.data);
-            // console.log(token)
+            // Lưu thông tin cần thiết
+            const currentUser = {
+                name: response.data.fullName || response.data.name,
+                role: response.data.role,
+                avatar: response.data.avatar
+            };
+            setUser(currentUser);
         } catch (error) {
             console.error('Lỗi khi load user:', error);
             logout();
@@ -42,19 +53,15 @@ const AuthProvider = ({ children }) => {
     };
 
     useEffect(() => {
-
-
         loadUser();
     }, []);
 
-
     return (
-        <AuthContext.Provider value={{ user, setUser, loading, logout, login, loadUser }}>
+        <AuthContext.Provider value={{ user, loading, logout, login, loadUser }}>
             {children}
         </AuthContext.Provider>
     );
 };
 
-const useAuth = () => useContext(AuthContext);
-
-export { AuthProvider, useAuth };
+// Hook dùng trong các component
+export const useAuth = () => useContext(AuthContext);
