@@ -104,5 +104,10 @@ public class UserService {
         user.setTokenExpiresAt(null);
         userRepository.save(user);
     }
+    // current user
+    public User getCurrentUser(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
 }
 

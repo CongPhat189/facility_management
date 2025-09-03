@@ -1,5 +1,6 @@
 package com.trancongphat.facility_management.service;
 
+import com.trancongphat.facility_management.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -18,14 +19,16 @@ public class JwtService {
         this.SECRET_KEY = secretKey;
     }
 
-    public String generateToken(String email) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(user.getEmail()) // dùng email làm subject
+                .claim("role", user.getRole().name().toLowerCase()) // lấy role từ user
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1 ngày
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
+
 
     public String extractUsername(String token) {
         return Jwts.parser()
@@ -53,5 +56,9 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
+
 }
 

@@ -25,6 +25,7 @@ public class ClassroomService {
 
     @Autowired
     private ClassroomRepository classroomRepo;
+    @Autowired
     private CloudinaryService cloudinaryService;
 
     public ClassroomResponseDTO createClassroom(ClassroomRequestDTO dto) throws IOException {

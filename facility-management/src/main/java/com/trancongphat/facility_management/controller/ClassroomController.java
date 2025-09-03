@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@PreAuthorize( "hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("api/admin/classrooms")
 public class ClassroomController {

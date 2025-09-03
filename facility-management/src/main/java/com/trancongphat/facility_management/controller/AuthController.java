@@ -116,8 +116,8 @@ public class AuthController {
             }
 
             // 7. Trả về JWT token
-            String token = jwtService.generateToken(user.getEmail());
-            LoginResponse response = new LoginResponse(token, user.getRole().name(), user.getFullName());
+            String token = jwtService.generateToken(user);
+            LoginResponse response = new LoginResponse(user.getUserId(),token, user.getRole().name(), user.getFullName(), user.getAvatar());
 
             return ResponseEntity.ok(response);
 

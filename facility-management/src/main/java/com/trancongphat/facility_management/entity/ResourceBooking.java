@@ -37,4 +37,44 @@ public class ResourceBooking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_id")
     private Equipment equipment;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public Booking getBooking() {
+        return booking;
+    }
+
+    public void setBooking(Booking booking) {
+        this.booking = booking;
+    }
+
+    public Classroom getClassroom() {
+        return classroom;
+    }
+
+    public void setClassroom(Classroom classroom) {
+        this.classroom = classroom;
+    }
+
+    public SportField getSportField() {
+        return sportField;
+    }
+
+    public void setSportField(SportField sportField) {
+        this.sportField = sportField;
+    }
+
+    public Equipment getEquipment() {
+        return equipment;
+    }
+
+    public void setEquipment(Equipment equipment) {
+        this.equipment = equipment;
+    }
 }

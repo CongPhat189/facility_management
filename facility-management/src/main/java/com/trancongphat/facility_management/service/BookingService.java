@@ -3,6 +3,7 @@ package com.trancongphat.facility_management.service;
 import com.trancongphat.facility_management.dto.BookingResponseDTO;
 import com.trancongphat.facility_management.dto.CreateBookingRequest;
 import com.trancongphat.facility_management.entity.Booking;
+import com.trancongphat.facility_management.entity.ResourceBooking;
 import com.trancongphat.facility_management.entity.User;
 import com.trancongphat.facility_management.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class BookingService {
     private InvoiceService invoiceService;
     @Autowired
     private UserRepository userRepo;
+    @Autowired
+    private ResourceBookingRepository resourceBookingRepository;
 
 
 
@@ -35,6 +38,9 @@ public class BookingService {
         if (req.getUserId() == null) throw new IllegalArgumentException("userId required");
         if (req.getStartTime() == null || req.getEndTime() == null) throw new IllegalArgumentException("start/end required");
         if (!req.getEndTime().isAfter(req.getStartTime())) throw new IllegalArgumentException("end must be after start");
+        if (req.getStartTime().isBefore(java.time.LocalDateTime.now())) {
+            throw new IllegalArgumentException("Không thể đặt lịch trong quá khứ");
+        }
 
         User user = userRepo.findById(Math.toIntExact(req.getUserId()))
                 .orElseThrow(() -> new IllegalArgumentException("user not found"));
@@ -59,7 +65,32 @@ public class BookingService {
             booking.setPaymentRequired(true);
         }
 
+
         booking = bookingRepo.save(booking);
+        ResourceBooking rb = new ResourceBooking();
+        rb.setBooking(booking);
+
+        switch (rt) {
+            case CLASSROOM -> {
+                var classroom = classroomRepo.findById(req.getResourceId())
+                        .orElseThrow(() -> new IllegalArgumentException("Classroom not found"));
+                rb.setClassroom(classroom);
+            }
+            case SPORT_FIELD -> {
+                var field = fieldRepo.findById(req.getResourceId())
+                        .orElseThrow(() -> new IllegalArgumentException("Sport field not found"));
+                rb.setSportField(field);
+            }
+            case EQUIPMENT -> {
+                var equipment = equipmentRepo.findById(req.getResourceId())
+                        .orElseThrow(() -> new IllegalArgumentException("Equipment not found"));
+                rb.setEquipment(equipment);
+            }
+        }
+        resourceBookingRepository.save(rb);
+
+
+
 
         // if sport field -> create invoice (immediately) using invoiceService
         if (rt == Booking.ResourceType.SPORT_FIELD) {
