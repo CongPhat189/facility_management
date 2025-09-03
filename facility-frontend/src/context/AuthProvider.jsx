@@ -39,6 +39,7 @@ export const AuthProvider = ({ children }) => {
             const response = await authAPIs().get(endpoints['current-user']);
             // Lưu thông tin cần thiết
             const currentUser = {
+                id: response.data.userId,
                 name: response.data.fullName || response.data.name,
                 role: response.data.role,
                 avatar: response.data.avatar
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         loadUser();
-    }, []);
+    }, [cookie.load("jwtToken")]);
 
     return (
         <AuthContext.Provider value={{ user, loading, logout, login, loadUser }}>

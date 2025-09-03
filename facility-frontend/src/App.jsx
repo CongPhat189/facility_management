@@ -9,6 +9,8 @@ import Dashboard from './pages/Dashboard';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import BorrowClassroom from './pages/BorrowClassroom';
+import BorrowEquipment from './pages/BorrowEquipment';
 
 
 
@@ -29,14 +31,10 @@ function App() {
             <Route path="/register-student" element={<StudentRegister />} />
             <Route path="/request-lecturer" element={<LecturerRequest />} />
             <Route path="/" element={<Home />} />
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
-                  <Dashboard />
-                </PrivateRoute>
-              }
-            />
+            <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+            <Route path="/classroom-booking" element={<PrivateRoute><BorrowClassroom /></PrivateRoute>} />
+            <Route path="/equipment-booking" element={<PrivateRoute><BorrowEquipment /></PrivateRoute>} />
+
           </Routes>
 
           <ToastContainer

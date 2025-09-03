@@ -21,7 +21,7 @@ export const endpoints = {
     'sport_field-details': (sportFieldId) => `/user/sport-fields/${sportFieldId}`,
     'equipments': '/user/equipments',
     'equipment-details': (equipmentId) => `/user/equipments/${equipmentId}`,
-    'bookings': '/bookings',
+    'bookings': (userId) => `/bookings/user/${userId}`,
     'boooking-details': (bookingId) => `/bookings/${bookingId}`,
     'create-booking': '/bookings/create',
     'cancel-booking': (bookingId) => `/bookings/cancel/${bookingId}`,
