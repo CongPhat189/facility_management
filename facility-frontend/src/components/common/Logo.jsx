@@ -20,9 +20,7 @@ const Logo = ({ size = 'large' }) => {
             </h1>
             {size === 'large' && (
                 <>
-                    <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-                        Hệ thống Quản lý Cơ sở Vật chất
-                    </h2>
+
                     <p className="text-gray-600">Trường Đại học Mở Thành phố Hồ Chí Minh</p>
                 </>
             )}
