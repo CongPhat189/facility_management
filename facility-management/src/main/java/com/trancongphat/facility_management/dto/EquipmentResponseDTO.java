@@ -1,6 +1,5 @@
 package com.trancongphat.facility_management.dto;
 import com.trancongphat.facility_management.entity.Equipment;
-import org.springframework.web.multipart.MultipartFile;
 
 public class EquipmentResponseDTO {
     private Integer id;
@@ -8,6 +7,7 @@ public class EquipmentResponseDTO {
     private Equipment.EquipmentType equipmentType;
     private String model;
     private String serialNumber;
+    private Integer quantity;
     private Equipment.Status status;
     private String purchaseDate;
     private String lastMaintenance;
@@ -92,5 +92,13 @@ public class EquipmentResponseDTO {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

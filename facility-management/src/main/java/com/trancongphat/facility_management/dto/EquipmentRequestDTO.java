@@ -9,6 +9,7 @@ public class EquipmentRequestDTO {
     private Equipment.EquipmentType equipmentType;
     private String model;
     private String serialNumber;
+    private Integer quantity;
     private Equipment.Status status;
     private String purchaseDate;
     private String lastMaintenance;
@@ -85,5 +86,13 @@ public class EquipmentRequestDTO {
 
     public void setImageUrl( MultipartFile imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }

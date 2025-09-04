@@ -22,6 +22,7 @@ public class Equipment {
 
     private String model;
     private String serialNumber;
+    private Integer quantity;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -130,6 +131,12 @@ public class Equipment {
 
     public void setCreatedAt(Timestamp createdAt) {
         this.createdAt = createdAt;
+    }
+    public Integer getQuantity() {
+        return this.quantity;
+    }
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
     }
 }
 
