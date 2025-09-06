@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -94,7 +97,7 @@ public class BookingService {
 
         // if sport field -> create invoice (immediately) using invoiceService
         if (rt == Booking.ResourceType.SPORT_FIELD) {
-            invoiceService.createInvoiceForFieldBooking(booking, (int) Math.toIntExact(req.getPromotionId()));
+            invoiceService.createInvoiceForFieldBooking(booking);
         }
 
         BookingResponseDTO dto = new BookingResponseDTO();
@@ -139,6 +142,19 @@ public class BookingService {
     public java.util.Optional<Booking> findById(Integer id) {
         return bookingRepo.findById(id);
     }
+
+    // get bookings by date and resource type
+    public List<Booking> getBookingsByDateAndResourceType(LocalDate date, String resourceType) {
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
+
+        return bookingRepo.findByDateAndResourceType(
+                Booking.ResourceType.valueOf(resourceType),
+                startOfDay,
+                endOfDay
+        );
+    }
+
 
 
 }

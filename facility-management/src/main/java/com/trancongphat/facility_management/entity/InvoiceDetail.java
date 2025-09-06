@@ -38,7 +38,7 @@ public class InvoiceDetail {
 
 
     public enum InvoiceItemType {
-        CLASSROOM, FIELD, EQUIPMENT
+        sport_field
     }
 
     public Integer getDetailId() {

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -38,12 +39,23 @@ public class PaymentController {
     }
 
     // MoMo notify endpoint (configured as notifyUrl)
-    @PostMapping("/momo/notify")
-    public ResponseEntity<?> momoNotify(@RequestParam String invoiceId,
-                                        @RequestParam String transId,
-                                        @RequestParam(required = false) String extra) {
-        Invoice inv = paymentService.confirmMomo(invoiceId, transId, extra);
+
+
+    @PostMapping("/momo/confirm-local/{invoiceId}")
+    public ResponseEntity<?> confirmLocal(
+            @PathVariable Integer invoiceId,
+            @RequestParam(required = false) String momoTransId) {
+
+        // ✅ Giả lập MoMo trả về thành công
+        Invoice inv = paymentService.confirmMomo(
+                String.valueOf(invoiceId),
+                momoTransId != null ? momoTransId : UUID.randomUUID().toString(),
+                "LOCAL TEST"
+        );
+
         return ResponseEntity.ok(paymentService.toDto(inv));
     }
+
+
 }
 

@@ -29,7 +29,7 @@ public class InvoiceService {
     }
 
     @Transactional
-    public Invoice createInvoiceForFieldBooking(Booking booking, Integer promotionId) {
+    public Invoice createInvoiceForFieldBooking(Booking booking) {
         // find field info by resourceId
         SportField field = sportFieldRepo.findById(booking.getResourceId())
                 .orElseThrow(() -> new IllegalArgumentException("Field not found"));
@@ -40,27 +40,16 @@ public class InvoiceService {
 
         BigDecimal base = field.getPricePerHour().multiply(hours);
 
-        BigDecimal discount = BigDecimal.ZERO;
-        if (promotionId != null) {
-            Promotion promo = promotionRepo.findById(Math.toIntExact(promotionId))
-                    .orElseThrow(() -> new IllegalArgumentException("Promotion not found"));
-            if (promo.getIsActive()) {
-                if ("PERCENT".equalsIgnoreCase(String.valueOf(promo.getDiscountType()))) {
-                    discount = base.multiply(promo.getDiscountValue()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-                } else {
-                    discount = promo.getDiscountValue();
-                }
-            }
-        }
 
-        BigDecimal finalAmount = base.subtract(discount);
+
+        BigDecimal finalAmount = base;
         if (finalAmount.compareTo(BigDecimal.ZERO) < 0) finalAmount = BigDecimal.ZERO;
 
         Invoice inv = new Invoice();
         inv.setBooking(booking);
         inv.setUser(booking.getUser());
         inv.setTotalAmount(base);
-        inv.setDiscount(discount);
+        inv.setDueDate( booking.getEndTime().plusDays(7) );
         inv.setFinalAmount(finalAmount);
         inv.setStatus(Invoice.InvoiceStatus.PENDING);
         inv.setIssuedAt(LocalDateTime.now());
@@ -70,6 +59,8 @@ public class InvoiceService {
         InvoiceDetail detail = new InvoiceDetail();
         detail.setInvoice(inv);
         detail.setItemName("Thuê sân: " + field.getFieldName());
+        detail.setItemId(booking.getResourceId());
+        detail.setItemType(InvoiceDetail.InvoiceItemType.valueOf("sport_field"));
         detail.setQuantity(1);
         detail.setUnitPrice(field.getPricePerHour());
         detail.setDurationHours(hours);

@@ -18,6 +18,7 @@ public class SportFieldMapper {
     }
     public static SportFieldResponseDTO toDto(SportField sf){
         SportFieldResponseDTO dto = new SportFieldResponseDTO();
+        dto.setId(sf.getId());
         dto.setFieldName(sf.getFieldName());
         dto.setFieldType(sf.getFieldType());
         dto.setPricePerHour(sf.getPricePerHour());

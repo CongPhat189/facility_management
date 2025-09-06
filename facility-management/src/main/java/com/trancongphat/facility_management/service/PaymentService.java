@@ -3,10 +3,12 @@ package com.trancongphat.facility_management.service;
 import com.trancongphat.facility_management.dto.InvoiceResponseDTO;
 import com.trancongphat.facility_management.entity.*;
 import com.trancongphat.facility_management.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.*;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
@@ -20,7 +22,8 @@ public class PaymentService {
     private final PaymentMethodRepository methodRepo;
     private final PaymentHistoryRepository historyRepo;
     private final RestTemplate rest = new RestTemplate();
-
+    @Autowired
+    private BookingRepository bookingRepository;
 
     private final String momoEndpoint;
     private final String momoPartnerCode;
@@ -54,10 +57,15 @@ public class PaymentService {
         PaymentMethod cash = methodRepo.findByMethodNameIgnoreCase("CASH")
                 .orElseThrow(() -> new IllegalStateException("CASH method not found"));
 
-        inv.setPaymentMethodId(cash.getMethodId());
-        inv.setStatus(Invoice.InvoiceStatus.PAID);
-        inv.setPaidAt(LocalDateTime.now());
-        invoiceRepo.save(inv);
+        // ✅ update trực tiếp invoice
+        invoiceRepo.updateInvoicePaid(invoiceId, cash.getMethodId(), "CASH-" + UUID.randomUUID(), LocalDateTime.now());
+
+        // ✅ update booking
+        inv = invoiceRepo.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
+        if (inv.getBooking() != null) {
+            bookingRepository.approveBooking(inv.getBooking().getBookingId());
+        }
 
         PaymentHistory his = new PaymentHistory();
         his.setInvoice(inv);
@@ -78,7 +86,9 @@ public class PaymentService {
 
         String requestId = UUID.randomUUID().toString();
         String orderId = "INV-" + invoiceId + "-" + System.currentTimeMillis();
-        String amount = inv.getFinalAmount().setScale(0, BigDecimal.ROUND_HALF_UP).toPlainString(); // momo often requires integer
+        String amount = inv.getFinalAmount()
+                .setScale(0, BigDecimal.ROUND_HALF_UP)
+                .toPlainString(); // MoMo yêu cầu số nguyên
         String orderInfo = "Payment for invoice " + invoiceId;
 
         Map<String, String> params = new HashMap<>();
@@ -88,20 +98,22 @@ public class PaymentService {
         params.put("amount", amount);
         params.put("orderId", orderId);
         params.put("orderInfo", orderInfo);
-        params.put("returnUrl", momoReturnUrl);
-        params.put("notifyUrl", momoNotifyUrl);
+        params.put("redirectUrl", momoReturnUrl);
+        params.put("ipnUrl", momoNotifyUrl);
         params.put("extraData", "");
-        params.put("requestType", "captureWallet");
+        params.put("requestType", momoRequestType);
 
-        // create signature: rawString = "accessKey=...&amount=...&..."
+        // ✅ rawSignature MoMo yêu cầu đủ cả redirectUrl và ipnUrl
         String rawSignature = "accessKey=" + momoAccessKey +
                 "&amount=" + amount +
                 "&extraData=" + "" +
+                "&ipnUrl=" + momoNotifyUrl +
                 "&orderId=" + orderId +
                 "&orderInfo=" + orderInfo +
                 "&partnerCode=" + momoPartnerCode +
+                "&redirectUrl=" + momoReturnUrl +
                 "&requestId=" + requestId +
-                "&requestType=captureWallet";
+                "&requestType=" + momoRequestType;
 
         String signature = hmacSHA256(rawSignature, momoSecretKey);
         params.put("signature", signature);
@@ -113,9 +125,9 @@ public class PaymentService {
         Map resp = rest.postForObject(momoEndpoint, request, Map.class);
         if (resp == null) throw new IllegalStateException("MoMo no response");
 
-        // MoMo response contains payUrl or payUrl
         Object payUrl = resp.get("payUrl");
         if (payUrl == null) throw new IllegalStateException("MoMo payUrl absent: " + resp);
+
         return payUrl.toString();
     }
 
@@ -136,17 +148,22 @@ public class PaymentService {
 
     @Transactional
     public Invoice confirmMomo(String invoiceIdStr, String momoTransId, String providerResponse) {
-        Integer invoiceId = Math.toIntExact(Long.valueOf(invoiceIdStr));
+        Integer invoiceId = Integer.valueOf(invoiceIdStr);
         Invoice inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
         PaymentMethod momo = methodRepo.findByMethodNameIgnoreCase("MOMO")
                 .orElseThrow(() -> new IllegalStateException("MOMO method missing"));
 
-        inv.setPaymentMethodId(momo.getMethodId());
-        inv.setTransactionId(momoTransId);
-        inv.setStatus(Invoice.InvoiceStatus.PAID);
-        inv.setPaidAt(LocalDateTime.now());
-        invoiceRepo.save(inv);
+
+        // ✅ update trực tiếp invoice
+        invoiceRepo.updateInvoicePaid(invoiceId, momo.getMethodId(), momoTransId, LocalDateTime.now());
+
+        // ✅ update booking
+        inv = invoiceRepo.findById(invoiceId)
+                .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
+        if (inv.getBooking() != null) {
+            bookingRepository.approveBooking(inv.getBooking().getBookingId());
+        }
 
         PaymentHistory his = new PaymentHistory();
         his.setInvoice(inv);

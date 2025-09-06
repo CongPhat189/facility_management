@@ -1,5 +1,7 @@
 package com.trancongphat.facility_management.dto;
 
+import com.trancongphat.facility_management.entity.Booking;
+
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 
@@ -67,4 +69,16 @@ public class BookingResponseDTO {
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
+    public static BookingResponseDTO fromEntity(Booking booking) {
+        BookingResponseDTO dto = new BookingResponseDTO();
+        dto.setBookingId(booking.getBookingId());
+        dto.setResourceType(booking.getResourceType().name());
+        dto.setResourceId(booking.getResourceId());
+        dto.setStartTime(booking.getStartTime());
+        dto.setEndTime(booking.getEndTime());
+        dto.setStatus(booking.getStatus().name());
+        dto.setPurpose(booking.getPurpose());
+        return dto;
+    }
+
 }

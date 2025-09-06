@@ -2,10 +2,14 @@ package com.trancongphat.facility_management.repository;
 
 import com.trancongphat.facility_management.entity.*;
 import com.trancongphat.facility_management.entity.Booking.BookingStatus;
+import com.trancongphat.facility_management.entity.Booking.ResourceType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,5 +24,19 @@ public interface BookingRepository extends JpaRepository<Booking, Integer> {
             "and b.status <> com.trancongphat.facility_management.entity.Booking.BookingStatus.CANCELLED " +
             "and b.startTime < ?4 and b.endTime > ?3")
     boolean existsOverlap(Booking.ResourceType resourceType, Integer resourceId, LocalDateTime start, LocalDateTime end);
+
+    @Query("SELECT b FROM Booking b " +
+            "WHERE b.resourceType = :resourceType " +
+            "AND b.startTime >= :startOfDay " +
+            "AND b.startTime < :endOfDay " +
+            "AND b.status <> com.trancongphat.facility_management.entity.Booking.BookingStatus.CANCELLED")
+    List<Booking> findByDateAndResourceType(
+            @Param("resourceType") Booking.ResourceType resourceType,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay
+    );
+    @Modifying
+    @Query("UPDATE Booking b SET b.status = 'APPROVED' WHERE b.bookingId = :bookingId")
+    int approveBooking(@Param("bookingId") Integer bookingId);
 
 }

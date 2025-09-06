@@ -1,55 +1,72 @@
 package com.trancongphat.facility_management.controller;
 
+import com.trancongphat.facility_management.dto.BookingResponseDTO;
 import com.trancongphat.facility_management.entity.Booking;
 import com.trancongphat.facility_management.entity.Booking.BookingStatus;
 import com.trancongphat.facility_management.repository.BookingRepository;
 import com.trancongphat.facility_management.service.AdminService;
+import com.trancongphat.facility_management.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
+
 @PreAuthorize( "hasRole('ROLE_ADMIN')")
 @RestController
 @RequestMapping("api/admin/bookings")
 public class AdminBookingController {
+    @Autowired
+    private  AdminService adminService;
+    @Autowired
+    private  BookingRepository bookingRepo;
+    @Autowired
+    private BookingService bookingService;
 
-    private final AdminService adminService;
-    private final BookingRepository bookingRepo;
 
-    public AdminBookingController(AdminService adminService, BookingRepository bookingRepo) {
-        this.adminService = adminService;
-        this.bookingRepo = bookingRepo;
-    }
-
-    // Lấy danh sách booking đang chờ duyệt
     @GetMapping("/pending")
-    public List<Booking> getPendingBookings() {
-        return bookingRepo.findByStatus(BookingStatus.PENDING);
+    public List<BookingResponseDTO> getPendingBookings() {
+        return bookingRepo.findByStatus(BookingStatus.PENDING)
+                .stream().map(BookingResponseDTO::fromEntity).collect(Collectors.toList());
     }
 
-    // Admin duyệt booking
     @PostMapping("/{id}/approve")
-    public Booking approveBooking(@PathVariable Integer id, @RequestParam Integer adminId) {
-        return adminService.approveBooking(id, adminId);
+    public BookingResponseDTO approveBooking(@PathVariable Integer id, @RequestParam Integer adminId) {
+        return BookingResponseDTO.fromEntity(adminService.approveBooking(id, adminId));
     }
 
-    // Admin từ chối booking
     @PostMapping("/{id}/reject")
-    public Booking rejectBooking(@PathVariable Integer id,
-                                 @RequestParam String reason,
-                                 @RequestParam Integer adminId) {
-        return adminService.rejectBooking(id, reason, adminId);
+    public BookingResponseDTO rejectBooking(@PathVariable Integer id,
+                                            @RequestParam String reason,
+                                            @RequestParam Integer adminId) {
+        return BookingResponseDTO.fromEntity(adminService.rejectBooking(id, reason, adminId));
     }
-    // Admin lấy danh sach tất cả booking
+
     @GetMapping
-    public List<Booking> getAllBookings() {
-        return bookingRepo.findAll();
+    public List<BookingResponseDTO> getAllBookings() {
+        return bookingRepo.findAll()
+                .stream().map(BookingResponseDTO::fromEntity).collect(Collectors.toList());
     }
-    // Admin lấy thông tin chi tiết booking theo ID
+
     @GetMapping("/{id}")
-    public Booking getBookingById(@PathVariable Integer id) {
-        return bookingRepo.findById(id)
+    public BookingResponseDTO getBookingById(@PathVariable Integer id) {
+        Booking booking = bookingRepo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Booking not found with id: " + id));
+        return BookingResponseDTO.fromEntity(booking);
     }
+
+    @GetMapping("/by-date")
+    public ResponseEntity<List<BookingResponseDTO>> getBookingsByDate(
+            @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam("resourceType") String resourceType
+    ) {
+        List<BookingResponseDTO> bookings = bookingService.getBookingsByDateAndResourceType(date, resourceType)
+                .stream().map(BookingResponseDTO::fromEntity).collect(Collectors.toList());
+        return ResponseEntity.ok(bookings);
+    }
+
 }

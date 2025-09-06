@@ -38,7 +38,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/register/**", "/api/auth/login", "/api/auth/verify","/api/admin/lecturer-requests/{id}/approve").permitAll()
+                        .requestMatchers("/api/auth/register/**", "/api/auth/login", "/api/auth/verify","/api/admin/lecturer-requests/{id}/approve", "/api/payments/momo/confirm-local/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
