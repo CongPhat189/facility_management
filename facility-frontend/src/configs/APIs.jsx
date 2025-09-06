@@ -25,12 +25,15 @@ export const endpoints = {
     'boooking-details': (bookingId) => `/bookings/${bookingId}`,
     'create-booking': '/bookings/create',
     'cancel-booking': (bookingId) => `/bookings/cancel/${bookingId}`,
+    'invoiceByBooking': (bookingId) => `/invoices/by-booking/${bookingId}`,
 
 
 
 
     // APIs for Momo
     'retuernURL': '/api/payment/momo/return',
+    'momoInit': (invoiceId) => `/payments/momo/init/${invoiceId}`,
+
 
 
     // APIs for admin

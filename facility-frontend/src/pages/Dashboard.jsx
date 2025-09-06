@@ -225,7 +225,7 @@ const Dashboard = () => {
                                 <p className="text-slate-600 mb-4">
                                     Đặt sân thể thao cho các hoạt động vận động và giải trí
                                 </p>
-                                <button className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl">
+                                <button onClick={() => navigate("/sportfield-booking")} className="w-full px-4 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 font-semibold shadow-lg hover:shadow-xl">
                                     Bắt đầu đặt lịch
                                 </button>
                             </div>
@@ -338,8 +338,8 @@ const Dashboard = () => {
                                     disabled={currentPage === 1}
                                     onClick={() => setCurrentPage(currentPage - 1)}
                                     className={`px-4 py-2 rounded-lg font-medium transition-all ${currentPage === 1
-                                            ? "text-slate-400 bg-slate-200 cursor-not-allowed"
-                                            : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
+                                        ? "text-slate-400 bg-slate-200 cursor-not-allowed"
+                                        : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
                                         }`}
                                 >
                                     Trước
@@ -349,8 +349,8 @@ const Dashboard = () => {
                                         key={i}
                                         onClick={() => setCurrentPage(i + 1)}
                                         className={`px-4 py-2 rounded-lg font-medium transition-all ${currentPage === i + 1
-                                                ? "bg-blue-600 text-white shadow-lg"
-                                                : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
+                                            ? "bg-blue-600 text-white shadow-lg"
+                                            : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
                                             }`}
                                     >
                                         {i + 1}
@@ -360,8 +360,8 @@ const Dashboard = () => {
                                     disabled={currentPage === totalPages}
                                     onClick={() => setCurrentPage(currentPage + 1)}
                                     className={`px-4 py-2 rounded-lg font-medium transition-all ${currentPage === totalPages
-                                            ? "text-slate-400 bg-slate-200 cursor-not-allowed"
-                                            : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
+                                        ? "text-slate-400 bg-slate-200 cursor-not-allowed"
+                                        : "text-blue-600 bg-white border border-blue-200 hover:bg-blue-50 shadow-sm"
                                         }`}
                                 >
                                     Sau

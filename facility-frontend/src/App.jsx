@@ -11,6 +11,9 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import BorrowClassroom from './pages/BorrowClassroom';
 import BorrowEquipment from './pages/BorrowEquipment';
+import BookSportField from './pages/BookSportField';
+import InvoicePage from './pages/InvoicePage';
+import MomoReturnPage from './pages/MomoReturnPage';
 
 
 
@@ -34,6 +37,12 @@ function App() {
             <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
             <Route path="/classroom-booking" element={<PrivateRoute><BorrowClassroom /></PrivateRoute>} />
             <Route path="/equipment-booking" element={<PrivateRoute><BorrowEquipment /></PrivateRoute>} />
+            <Route path="/sportfield-booking" element={<PrivateRoute><BookSportField /></PrivateRoute>} />
+            <Route path="/invoice/:bookingId" element={<PrivateRoute><InvoicePage /></PrivateRoute>} />
+            <Route path="/momo-return" element={<MomoReturnPage />} />
+
+
+
 
           </Routes>
 

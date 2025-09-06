@@ -87,7 +87,7 @@ const BorrowClassroom = () => {
             console.log(res.data);
 
             // reload danh sách booking
-            let updated = await authAPIs().get(endpoints.bookings);
+            let updated = await authAPIs().get(endpoints.bookings(user?.id));
             setBookings(updated.data);
             navigate("/dashboard");
         } catch (err) {
