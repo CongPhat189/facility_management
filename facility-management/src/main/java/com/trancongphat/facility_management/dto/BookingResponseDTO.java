@@ -14,6 +14,7 @@ public class BookingResponseDTO {
     private String status;
     private String purpose;
 
+
     public Integer getBookingId() {
         return bookingId;
     }
