@@ -3,6 +3,8 @@ import { Calendar, BookOpen, Goal, Laptop, LogOut, Clock, Users, ChevronRight, B
 import { authAPIs, endpoints } from "../configs/APIs";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import Chatbot from "../components/Chatbot";
+import ChatbotFAQ from "../components/ChatbotFAQ";
 
 const Dashboard = () => {
     const { user, logout } = useAuth();
@@ -289,7 +291,7 @@ const Dashboard = () => {
                                             serviceIcon = <BookOpen className="w-4 h-4 text-blue-500" />;
                                         } else if (b.resourceType === "SPORT_FIELD") {
                                             const field = sportFields.find(s => s.id === b.resourceId);
-                                            serviceName = field ? field.name : "Sân thể thao";
+                                            serviceName = field ? field.fieldName : "Sân thể thao";
                                             serviceType = "Sân bóng";
                                             serviceIcon = <Goal className="w-4 h-4 text-emerald-500" />;
                                         } else if (b.resourceType === "EQUIPMENT") {
@@ -395,7 +397,7 @@ const Dashboard = () => {
                                         bgColor = "bg-blue-50 border-blue-100";
                                     } else if (b.resourceType === "SPORT_FIELD") {
                                         const field = sportFields.find(f => f.id === b.resourceId);
-                                        serviceName = field ? field.name : "Sân thể thao";
+                                        serviceName = field ? field.fieldName : "Sân thể thao";
                                         serviceIcon = <Goal className="w-4 h-4 text-emerald-600" />;
                                         bgColor = "bg-emerald-50 border-emerald-100";
                                     } else if (b.resourceType === "EQUIPMENT") {
@@ -464,7 +466,14 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+
             </div>
+
+            <div>
+                <Chatbot />
+            </div>
+            <ChatbotFAQ />
+
         </div>
     );
 };

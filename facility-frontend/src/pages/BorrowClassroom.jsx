@@ -45,16 +45,47 @@ const BorrowClassroom = () => {
         }
     }, [user]);
 
+    useEffect(() => {
+        if (!date) return;
+
+        const loadBookings = async () => {
+            try {
+                let res = await authAPIs().get(
+                    `${endpoints["getAllBookings"]}/by-date?date=${date}&resourceType=CLASSROOM`
+                );
+                setBookings(res.data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Không tải được lịch đặt!");
+            }
+        };
+        loadBookings();
+    }, [date]);
+
     // Check khung giờ đã đặt
-    const isSlotBooked = (slot) => {
+    const formatSlot = (startTime, endTime) => {
+        const start = new Date(startTime).toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+        const end = new Date(endTime).toLocaleTimeString("vi-VN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: false
+        });
+        return `${start}-${end}`;
+    };
+
+    const isSlotBooked = (classroomId, slot) => {
         return bookings.some(
             (b) =>
-                b.classroomId === parseInt(room) &&
-                b.date === date &&
-                b.timeSlot === slot &&
+                b.resourceId === classroomId &&
+                formatSlot(b.startTime, b.endTime) === slot &&
                 b.status !== "CANCELLED"
         );
     };
+
 
     // Ngày hôm nay (chặn ngày quá khứ)
     const today = new Date().toISOString().split("T")[0];
@@ -86,9 +117,7 @@ const BorrowClassroom = () => {
             toast.success("Đặt phòng thành công! Hãy đợi quản trị viên phê duyệt.");
             console.log(res.data);
 
-            // reload danh sách booking
-            let updated = await authAPIs().get(endpoints.bookings(user?.id));
-            setBookings(updated.data);
+
             navigate("/dashboard");
         } catch (err) {
             console.error(err);
@@ -186,7 +215,7 @@ const BorrowClassroom = () => {
                                 </label>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                     {timeSlots.map((slot) => {
-                                        const isBooked = isSlotBooked(slot);
+                                        const isBooked = isSlotBooked(parseInt(room), slot);
                                         const isSelected = timeSlot === slot;
 
                                         return (
