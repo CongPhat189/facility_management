@@ -17,13 +17,15 @@ import {
     Search,
     Laptop,
     Monitor,
-    Cpu
+    Cpu,
 } from "lucide-react";
 
 const BorrowEquipment = () => {
     const [equipments, setEquipments] = useState([]);
     const [selected, setSelected] = useState(null); // id thiết bị đã chọn
     const [quantities, setQuantities] = useState({}); // lưu số lượng từng thiết bị
+    const [bookings, setBookings] = useState([]); // lưu các booking để tính available
+
     const { user } = useAuth();
     const navigate = useNavigate();
 
@@ -35,6 +37,34 @@ const BorrowEquipment = () => {
     const [filterType, setFilterType] = useState("");
     const [filterAddress, setFilterAddress] = useState("");
 
+    // ===== Helper tính số lượng còn lại =====
+    const overlaps = (bStart, bEnd, sDate, eDate) => {
+        const start = new Date(`${sDate}T00:00:00`);
+        const end = new Date(`${eDate}T23:59:59`);
+        return new Date(bStart) <= end && new Date(bEnd) >= start;
+    };
+
+    const calcAvailable = (eqId) => {
+        const eq = equipments.find((x) => x.id === eqId);
+        if (!eq || !borrowDate || !returnDate) return eq ? eq.quantity : 0;
+
+        // chỉ tính booking PENDING hoặc APPROVED
+        const COUNT_STATUSES = new Set(["PENDING", "APPROVED"]);
+
+        const bookedQty = bookings
+            .filter(
+                (b) =>
+                    b.resourceType === "EQUIPMENT" &&
+                    b.resourceId === eqId &&
+                    COUNT_STATUSES.has(b.status) &&
+                    overlaps(b.startTime, b.endTime, borrowDate, returnDate)
+            )
+            .reduce((sum, b) => sum + (b.equipmentQuantity || 1), 0);
+
+        return Math.max(0, (eq.quantity || 0) - bookedQty);
+    };
+
+    // ===== API call =====
     // Lấy danh sách thiết bị
     useEffect(() => {
         const loadEquipments = async () => {
@@ -42,9 +72,8 @@ const BorrowEquipment = () => {
                 let res = await authAPIs().get(endpoints["equipments"]);
                 setEquipments(res.data);
 
-                // khởi tạo quantities cho từng thiết bị = 1
                 const initialQuantities = {};
-                res.data.forEach(eq => {
+                res.data.forEach((eq) => {
                     initialQuantities[eq.id] = 1;
                 });
                 setQuantities(initialQuantities);
@@ -56,13 +85,58 @@ const BorrowEquipment = () => {
         loadEquipments();
     }, []);
 
+    // Lấy booking trong khoảng borrowDate–returnDate
+    useEffect(() => {
+        if (!borrowDate || !returnDate) {
+            setBookings([]);
+            return;
+        }
+
+        const loadBookings = async () => {
+            try {
+                // backend của bạn có thể cần endpoint theo khoảng ngày
+                // tạm gọi theo từng ngày nếu chỉ có by-date
+                const dates = getDatesBetween(borrowDate, returnDate);
+                const reqs = dates.map((d) =>
+                    authAPIs().get(
+                        `${endpoints["getAllBookings"]}/by-date?date=${d}&resourceType=EQUIPMENT`
+                    )
+                );
+                const res = await Promise.all(reqs);
+                const merged = res.flatMap((r) => r.data || []);
+                setBookings(merged);
+            } catch (err) {
+                console.error(err);
+                toast.error("Không tải được lịch mượn thiết bị!");
+            }
+        };
+        loadBookings();
+    }, [borrowDate, returnDate]);
+
+    const getDatesBetween = (start, end) => {
+        if (!start || !end) return [];
+        const out = [];
+        const d = new Date(start);
+        const e = new Date(end);
+        while (d <= e) {
+            out.push(d.toISOString().split("T")[0]);
+            d.setDate(d.getDate() + 1);
+        }
+        return out;
+    };
+
+    // ===== Actions =====
     const handleSelect = (id) => {
         setSelected((prev) => (prev === id ? null : id));
     };
 
-    const updateQuantity = (id, delta, maxQuantity) => {
+    const updateQuantity = (id, delta) => {
+        const maxQuantity = calcAvailable(id);
         setQuantities((prev) => {
-            const newQty = Math.max(1, Math.min((prev[id] || 1) + delta, maxQuantity));
+            const newQty = Math.max(
+                1,
+                Math.min((prev[id] || 1) + delta, maxQuantity)
+            );
             return { ...prev, [id]: newQty };
         });
     };
@@ -84,8 +158,9 @@ const BorrowEquipment = () => {
         }
 
         const quantity = quantities[selected] || 1;
-        if (quantity > selectedEq.quantity) {
-            toast.warn("Số lượng vượt quá số còn lại!");
+        const available = calcAvailable(selected);
+        if (quantity > available) {
+            toast.warn(`Số lượng vượt quá số còn lại (${available})!`);
             return;
         }
 
@@ -117,18 +192,16 @@ const BorrowEquipment = () => {
         }
     };
 
-    // Lấy danh sách type và address duy nhất từ dữ liệu
-    const equipmentTypes = [...new Set(equipments.map(eq => eq.equipmentType))];
-    const equipmentAddresses = [...new Set(equipments.map(eq => eq.address))];
+    // ===== UI =====
+    const equipmentTypes = [...new Set(equipments.map((eq) => eq.equipmentType))];
+    const equipmentAddresses = [...new Set(equipments.map((eq) => eq.address))];
 
-    // Lọc thiết bị theo type + address
-    const filteredEquipments = equipments.filter(eq => {
+    const filteredEquipments = equipments.filter((eq) => {
         const typeMatch = filterType ? eq.equipmentType === filterType : true;
         const addressMatch = filterAddress ? eq.address === filterAddress : true;
         return typeMatch && addressMatch;
     });
 
-    // Nhóm theo type sau khi lọc
     const groupedEquipments = filteredEquipments.reduce((acc, eq) => {
         if (!acc[eq.equipmentType]) acc[eq.equipmentType] = [];
         acc[eq.equipmentType].push(eq);
@@ -143,11 +216,11 @@ const BorrowEquipment = () => {
 
     const getTypeIcon = (type) => {
         switch (type) {
-            case 'projector':
+            case "projector":
                 return <Monitor className="w-6 h-6 text-purple-600" />;
-            case 'laptop':
+            case "laptop":
                 return <Laptop className="w-6 h-6 text-blue-600" />;
-            case 'biological_model':
+            case "biological_model":
                 return <Cpu className="w-6 h-6 text-emerald-600" />;
             default:
                 return <Package className="w-6 h-6 text-slate-600" />;
@@ -156,14 +229,14 @@ const BorrowEquipment = () => {
 
     const getTypeColor = (type) => {
         switch (type) {
-            case 'projector':
-                return 'from-purple-500 to-indigo-600';
-            case 'laptop':
-                return 'from-blue-500 to-cyan-600';
-            case 'biological_model':
-                return 'from-emerald-500 to-teal-600';
+            case "projector":
+                return "from-purple-500 to-indigo-600";
+            case "laptop":
+                return "from-blue-500 to-cyan-600";
+            case "biological_model":
+                return "from-emerald-500 to-teal-600";
             default:
-                return 'from-slate-500 to-gray-600';
+                return "from-slate-500 to-gray-600";
         }
     };
 
@@ -180,8 +253,12 @@ const BorrowEquipment = () => {
                                 <Package className="w-8 h-8 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-3xl font-bold text-slate-800">Mượn thiết bị</h1>
-                                <p className="text-slate-600">Đặt lịch mượn thiết bị giảng dạy và học tập</p>
+                                <h1 className="text-3xl font-bold text-slate-800">
+                                    Mượn thiết bị
+                                </h1>
+                                <p className="text-slate-600">
+                                    Đặt lịch mượn thiết bị giảng dạy và học tập
+                                </p>
                             </div>
                         </div>
                         <button
@@ -204,7 +281,9 @@ const BorrowEquipment = () => {
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
-                                    <label className="block font-semibold text-slate-700">Ngày mượn *</label>
+                                    <label className="block font-semibold text-slate-700">
+                                        Ngày mượn *
+                                    </label>
                                     <input
                                         type="date"
                                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -213,7 +292,9 @@ const BorrowEquipment = () => {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <label className="block font-semibold text-slate-700">Ngày trả *</label>
+                                    <label className="block font-semibold text-slate-700">
+                                        Ngày trả *
+                                    </label>
                                     <input
                                         type="date"
                                         className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
@@ -232,7 +313,9 @@ const BorrowEquipment = () => {
                             </h3>
 
                             <div className="space-y-2">
-                                <label className="block font-semibold text-slate-700">Mô tả chi tiết *</label>
+                                <label className="block font-semibold text-slate-700">
+                                    Mô tả chi tiết *
+                                </label>
                                 <textarea
                                     className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
                                     rows="4"
@@ -254,9 +337,11 @@ const BorrowEquipment = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                            <label className="block font-semibold text-slate-700">Lọc theo loại</label>
+                            <label className="block font-semibold text-slate-700">
+                                Lọc theo loại
+                            </label>
                             <select
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-xl"
                                 value={filterType}
                                 onChange={(e) => setFilterType(e.target.value)}
                             >
@@ -269,15 +354,19 @@ const BorrowEquipment = () => {
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="block font-semibold text-slate-700">Lọc theo địa chỉ</label>
+                            <label className="block font-semibold text-slate-700">
+                                Lọc theo địa chỉ
+                            </label>
                             <select
-                                className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                                className="w-full px-4 py-3 border border-slate-300 rounded-xl"
                                 value={filterAddress}
                                 onChange={(e) => setFilterAddress(e.target.value)}
                             >
                                 <option value="">Tất cả địa chỉ</option>
                                 {equipmentAddresses.map((addr, idx) => (
-                                    <option key={idx} value={addr}>{addr}</option>
+                                    <option key={idx} value={addr}>
+                                        {addr}
+                                    </option>
                                 ))}
                             </select>
                         </div>
@@ -294,14 +383,20 @@ const BorrowEquipment = () => {
                     {Object.keys(groupedEquipments).length === 0 ? (
                         <div className="text-center py-12">
                             <Package className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-lg">Không có thiết bị nào phù hợp với bộ lọc</p>
+                            <p className="text-slate-500 text-lg">
+                                Không có thiết bị nào phù hợp với bộ lọc
+                            </p>
                         </div>
                     ) : (
                         <div className="space-y-8">
                             {Object.keys(groupedEquipments).map((equipmentType) => (
                                 <div key={equipmentType}>
                                     {/* Type Header */}
-                                    <div className={`bg-gradient-to-r ${getTypeColor(equipmentType)} rounded-xl p-4 mb-6 text-white`}>
+                                    <div
+                                        className={`bg-gradient-to-r ${getTypeColor(
+                                            equipmentType
+                                        )} rounded-xl p-4 mb-6 text-white`}
+                                    >
                                         <div className="flex items-center space-x-3">
                                             <div className="p-2 bg-white/20 rounded-lg">
                                                 {getTypeIcon(equipmentType)}
@@ -311,7 +406,8 @@ const BorrowEquipment = () => {
                                                     {equipmentTypeLabels[equipmentType] || equipmentType}
                                                 </h4>
                                                 <p className="text-white/80">
-                                                    {groupedEquipments[equipmentType].length} thiết bị có sẵn
+                                                    {groupedEquipments[equipmentType].length} thiết bị có
+                                                    sẵn
                                                 </p>
                                             </div>
                                         </div>
@@ -341,7 +437,7 @@ const BorrowEquipment = () => {
                                                         </div>
                                                     )}
                                                     <div className="absolute bottom-2 left-2 px-3 py-1 bg-emerald-500 text-white rounded-full text-sm font-semibold">
-                                                        Còn: {eq.quantity}
+                                                        Còn: {calcAvailable(eq.id)}
                                                     </div>
                                                 </div>
 
@@ -360,14 +456,16 @@ const BorrowEquipment = () => {
                                                 {selected === eq.id && (
                                                     <div className="mt-4 p-3 bg-blue-50 rounded-xl">
                                                         <div className="flex items-center justify-between">
-                                                            <span className="font-semibold text-slate-700">Số lượng:</span>
+                                                            <span className="font-semibold text-slate-700">
+                                                                Số lượng:
+                                                            </span>
                                                             <div className="flex items-center space-x-3">
                                                                 <button
                                                                     type="button"
                                                                     className="p-2 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        updateQuantity(eq.id, -1, eq.quantity);
+                                                                        updateQuantity(eq.id, -1);
                                                                     }}
                                                                 >
                                                                     <Minus className="w-4 h-4" />
@@ -380,7 +478,7 @@ const BorrowEquipment = () => {
                                                                     className="p-2 bg-slate-200 hover:bg-slate-300 rounded-full transition-colors"
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
-                                                                        updateQuantity(eq.id, 1, eq.quantity);
+                                                                        updateQuantity(eq.id, 1);
                                                                     }}
                                                                 >
                                                                     <Plus className="w-4 h-4" />
@@ -411,8 +509,9 @@ const BorrowEquipment = () => {
                         <div className="flex items-center space-x-4">
                             {selected && (
                                 <div className="text-sm text-slate-600">
-                                    Đã chọn: <span className="font-semibold">
-                                        {equipments.find(eq => eq.id === selected)?.name}
+                                    Đã chọn:{" "}
+                                    <span className="font-semibold">
+                                        {equipments.find((eq) => eq.id === selected)?.name}
                                     </span>
                                 </div>
                             )}
