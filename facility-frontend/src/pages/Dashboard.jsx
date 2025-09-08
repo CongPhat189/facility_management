@@ -3,7 +3,8 @@ import { Calendar, BookOpen, Goal, Laptop, LogOut, Clock, Users, ChevronRight, B
 import { authAPIs, endpoints } from "../configs/APIs";
 import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import Chatbot from "../components/Chatbot";
+import { toast } from "react-toastify";
+
 import ChatbotFAQ from "../components/ChatbotFAQ";
 
 const Dashboard = () => {
@@ -14,6 +15,8 @@ const Dashboard = () => {
     const [equipments, setEquipments] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const rowsPerPage = 5;
+    const [selectedBooking, setSelectedBooking] = useState(null);
+
 
     const navigate = useNavigate();
 
@@ -50,6 +53,24 @@ const Dashboard = () => {
         logout();
         navigate("/login");
     };
+    const handleCancel = async (bookingId) => {
+        if (!window.confirm("Bạn có chắc muốn huỷ booking này?")) return;
+
+        try {
+            await authAPIs().patch(
+                `${endpoints["cancel-booking"](bookingId)}?userId=${user?.id}`
+            );
+
+            toast.success("Huỷ booking thành công!");
+            // reload lại danh sách booking
+            const res = await authAPIs().get(endpoints.bookings(user?.id));
+            setBookings(res.data || []);
+        } catch (err) {
+            console.error(err);
+            toast.error("Huỷ booking thất bại!");
+        }
+    };
+
 
     const availableClassrooms = classrooms.filter(c => c.status === "available").length;
     const availableSportFields = sportFields.filter(s => s.status === "available").length;
@@ -76,7 +97,7 @@ const Dashboard = () => {
             case "PENDING": return "Chờ duyệt";
             case "APPROVED": return "Đã duyệt";
             case "REJECTED": return "Từ chối";
-            case "CANCELLED": return "Đã hủy";
+            case "CANCELED": return "Đã hủy";
             default: return status;
         }
     };
@@ -86,7 +107,7 @@ const Dashboard = () => {
             case "APPROVED": return "text-emerald-600 bg-emerald-50 border-emerald-200";
             case "PENDING": return "text-amber-600 bg-amber-50 border-amber-200";
             case "REJECTED": return "text-rose-600 bg-rose-50 border-rose-200";
-            case "CANCELLED": return "text-slate-500 bg-slate-50 border-slate-200";
+            case "CANCELED": return "text-slate-500 bg-slate-50 border-slate-200";
             default: return "text-slate-600 bg-slate-50 border-slate-200";
         }
     };
@@ -322,9 +343,24 @@ const Dashboard = () => {
                                                     </span>
                                                 </td>
                                                 <td className="py-4 px-6">
-                                                    <button className="text-blue-600 hover:text-blue-700 font-semibold text-sm hover:underline">
-                                                        Xem chi tiết
-                                                    </button>
+                                                    {b.status === "APPROVED" ? (
+                                                        <button
+                                                            onClick={() => setSelectedBooking(b)}
+                                                            className="text-blue-600 hover:text-blue-700 font-semibold text-sm hover:underline"
+                                                        >
+                                                            Xem chi tiết
+                                                        </button>
+                                                    ) : b.status === "PENDING" ? (
+                                                        <button
+                                                            onClick={() => handleCancel(b.bookingId)}
+                                                            className="text-red-600 hover:text-red-700 font-semibold text-sm hover:underline"
+                                                        >
+                                                            Huỷ booking
+                                                        </button>
+                                                    ) : (
+                                                        <span className="text-slate-400 text-sm">Không khả dụng</span>
+                                                    )}
+
                                                 </td>
                                             </tr>
                                         );
@@ -383,7 +419,7 @@ const Dashboard = () => {
 
                         <div className="p-6">
                             <div className="space-y-4">
-                                {bookings.slice(0, 5).map((b, i) => {
+                                {bookings.filter(b => b.status === "APPROVED").slice(0, 5).map((b, i) => {
                                     const { date, time } = formatDateTime(b.startTime, b.endTime);
 
                                     let serviceName = "";
@@ -463,15 +499,69 @@ const Dashboard = () => {
                                     {bookings.filter(b => b.status === "PENDING").length}
                                 </span>
                             </div>
+                            <div className="flex justify-between items-center">
+                                <span className="text-orange-100">Đã hủy</span>
+                                <span className="font-bold text-xl">
+                                    {bookings.filter(b => b.status === "CANCELED").length}
+                                </span>
+                            </div>
+
                         </div>
                     </div>
                 </div>
+                {/* Booking Detail Modal */}
+                {selectedBooking && (
+                    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative">
+                            <button
+                                onClick={() => setSelectedBooking(null)}
+                                className="absolute top-3 right-3 text-slate-500 hover:text-slate-700"
+                            >
+                                ✕
+                            </button>
+
+                            <h2 className="text-xl font-bold text-slate-800 mb-4">
+                                Chi tiết Booking #{selectedBooking.bookingId}
+                            </h2>
+
+                            <div className="space-y-3 text-slate-700">
+                                <p><span className="font-semibold">Họ tên:</span> {selectedBooking.fullName}</p>
+                                <p>
+                                    <span className="font-semibold">Dịch vụ:</span>{" "}
+                                    {selectedBooking.resourceType === "CLASSROOM"
+                                        ? classrooms.find(c => c.id === selectedBooking.resourceId)?.roomNumber || "Phòng học"
+                                        : selectedBooking.resourceType === "SPORT_FIELD"
+                                            ? sportFields.find(f => f.id === selectedBooking.resourceId)?.fieldName || "Sân thể thao"
+                                            : selectedBooking.resourceType === "EQUIPMENT"
+                                                ? equipments.find(e => e.id === selectedBooking.resourceId)?.name || "Thiết bị"
+                                                : ""}
+                                </p>
+                                <p><span className="font-semibold">Mục đích:</span> {selectedBooking.purpose}</p>
+                                <p><span className="font-semibold">Ngày bắt đầu:</span> {new Date(selectedBooking.startTime).toLocaleString("vi-VN")}</p>
+                                <p><span className="font-semibold">Ngày kết thúc:</span> {new Date(selectedBooking.endTime).toLocaleString("vi-VN")}</p>
+                                <p>
+                                    <span className="font-semibold">Trạng thái:</span>{" "}
+                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold border ${getStatusColor(selectedBooking.status)}`}>
+                                        {getStatusText(selectedBooking.status)}
+                                    </span>
+                                </p>
+                            </div>
+
+                            <div className="mt-6 flex justify-end">
+                                <button
+                                    onClick={() => setSelectedBooking(null)}
+                                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                >
+                                    Đóng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div>
 
-            <div>
-                <Chatbot />
-            </div>
+
             <ChatbotFAQ />
 
         </div>

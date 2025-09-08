@@ -47,6 +47,7 @@ export default function MomoReturnPage() {
                 } else {
                     toast.warn("MoMo xác nhận nhưng hệ thống chưa cập nhật!");
                 }
+                navigate("/dashboard");
 
             } catch (err) {
                 console.error("Lỗi confirm MoMo:", err);

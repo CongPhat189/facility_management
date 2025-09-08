@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import AdminLogin from './pages/AdminLogin';
 import StudentRegister from './pages/StudentRegister';
 import LecturerRequest from './pages/LecturerRequest';
 import { AuthProvider, useAuth } from './context/AuthProvider';
@@ -14,6 +15,7 @@ import BorrowEquipment from './pages/BorrowEquipment';
 import BookSportField from './pages/BookSportField';
 import InvoicePage from './pages/InvoicePage';
 import MomoReturnPage from './pages/MomoReturnPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 
 
@@ -25,12 +27,20 @@ function App() {
 
     return user ? children : <Navigate to="/login" replace />;
   }
+  function AdminRoute({ children }) {
+    const { user, loading } = useAuth();
+
+    if (loading) return <div>Loading...</div>;
+
+    return user && user.role === 'admin' ? children : <Navigate to="/admin/login" replace />;
+  }
   return (
     <AuthProvider>
       <BrowserRouter>
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={<AdminLogin />} />
             <Route path="/register-student" element={<StudentRegister />} />
             <Route path="/request-lecturer" element={<LecturerRequest />} />
             <Route path="/" element={<Home />} />
@@ -40,6 +50,8 @@ function App() {
             <Route path="/sportfield-booking" element={<PrivateRoute><BookSportField /></PrivateRoute>} />
             <Route path="/invoice/:bookingId" element={<PrivateRoute><InvoicePage /></PrivateRoute>} />
             <Route path="/momo-return" element={<MomoReturnPage />} />
+            <Route path="/admin/dashboard/*" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+
 
 
 

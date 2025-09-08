@@ -82,7 +82,7 @@ const BorrowClassroom = () => {
             (b) =>
                 b.resourceId === classroomId &&
                 formatSlot(b.startTime, b.endTime) === slot &&
-                b.status !== "CANCELLED"
+                b.status !== "CANCELED"
         );
     };
 

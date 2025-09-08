@@ -37,7 +37,7 @@ const BorrowEquipment = () => {
     const [filterType, setFilterType] = useState("");
     const [filterAddress, setFilterAddress] = useState("");
 
-    // ===== Helper tính số lượng còn lại =====
+    // tính số lượng còn lại 
     const overlaps = (bStart, bEnd, sDate, eDate) => {
         const start = new Date(`${sDate}T00:00:00`);
         const end = new Date(`${eDate}T23:59:59`);
@@ -48,7 +48,7 @@ const BorrowEquipment = () => {
         const eq = equipments.find((x) => x.id === eqId);
         if (!eq || !borrowDate || !returnDate) return eq ? eq.quantity : 0;
 
-        // chỉ tính booking PENDING hoặc APPROVED
+
         const COUNT_STATUSES = new Set(["PENDING", "APPROVED"]);
 
         const bookedQty = bookings
@@ -64,7 +64,7 @@ const BorrowEquipment = () => {
         return Math.max(0, (eq.quantity || 0) - bookedQty);
     };
 
-    // ===== API call =====
+
     // Lấy danh sách thiết bị
     useEffect(() => {
         const loadEquipments = async () => {
@@ -94,8 +94,7 @@ const BorrowEquipment = () => {
 
         const loadBookings = async () => {
             try {
-                // backend của bạn có thể cần endpoint theo khoảng ngày
-                // tạm gọi theo từng ngày nếu chỉ có by-date
+
                 const dates = getDatesBetween(borrowDate, returnDate);
                 const reqs = dates.map((d) =>
                     authAPIs().get(
@@ -192,7 +191,7 @@ const BorrowEquipment = () => {
         }
     };
 
-    // ===== UI =====
+
     const equipmentTypes = [...new Set(equipments.map((eq) => eq.equipmentType))];
     const equipmentAddresses = [...new Set(equipments.map((eq) => eq.address))];
 
@@ -270,9 +269,9 @@ const BorrowEquipment = () => {
                         </button>
                     </div>
 
-                    {/* Form Section */}
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Date Selection */}
+
                         <div className="space-y-6">
                             <h3 className="text-xl font-semibold text-slate-800 flex items-center">
                                 <Calendar className="w-6 h-6 mr-2 text-blue-600" />
@@ -305,7 +304,7 @@ const BorrowEquipment = () => {
                             </div>
                         </div>
 
-                        {/* Purpose */}
+
                         <div className="space-y-6">
                             <h3 className="text-xl font-semibold text-slate-800 flex items-center">
                                 <Target className="w-6 h-6 mr-2 text-emerald-600" />
@@ -328,7 +327,7 @@ const BorrowEquipment = () => {
                     </div>
                 </div>
 
-                {/* Filters Section */}
+
                 <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-8">
                     <h3 className="text-xl font-semibold text-slate-800 mb-4 flex items-center">
                         <Filter className="w-6 h-6 mr-2 text-indigo-600" />
@@ -373,7 +372,7 @@ const BorrowEquipment = () => {
                     </div>
                 </div>
 
-                {/* Equipment Selection */}
+
                 <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 mb-8">
                     <h3 className="text-xl font-semibold text-slate-800 mb-6 flex items-center">
                         <Search className="w-6 h-6 mr-2 text-orange-600" />
@@ -391,7 +390,7 @@ const BorrowEquipment = () => {
                         <div className="space-y-8">
                             {Object.keys(groupedEquipments).map((equipmentType) => (
                                 <div key={equipmentType}>
-                                    {/* Type Header */}
+
                                     <div
                                         className={`bg-gradient-to-r ${getTypeColor(
                                             equipmentType
@@ -413,7 +412,7 @@ const BorrowEquipment = () => {
                                         </div>
                                     </div>
 
-                                    {/* Equipment Grid */}
+
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                         {groupedEquipments[equipmentType].map((eq) => (
                                             <div
@@ -424,7 +423,7 @@ const BorrowEquipment = () => {
                                                     }`}
                                                 onClick={() => handleSelect(eq.id)}
                                             >
-                                                {/* Equipment Image */}
+
                                                 <div className="relative mb-4">
                                                     <img
                                                         src={eq.imageUrl}
@@ -441,7 +440,7 @@ const BorrowEquipment = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Equipment Info */}
+
                                                 <div className="space-y-2">
                                                     <h5 className="font-bold text-lg text-slate-800 group-hover:text-blue-600 transition-colors">
                                                         {eq.name}
@@ -452,7 +451,7 @@ const BorrowEquipment = () => {
                                                     </div>
                                                 </div>
 
-                                                {/* Quantity Control */}
+
                                                 {selected === eq.id && (
                                                     <div className="mt-4 p-3 bg-blue-50 rounded-xl">
                                                         <div className="flex items-center justify-between">
@@ -496,7 +495,7 @@ const BorrowEquipment = () => {
                     )}
                 </div>
 
-                {/* Action Buttons */}
+
                 <div className="bg-white rounded-2xl shadow-lg border border-slate-100 p-6">
                     <div className="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
                         <button

@@ -37,26 +37,37 @@ export const endpoints = {
 
 
     // APIs for admin
-    'createClassroom': '/admin/classrooms/',
+    'createClassroom': '/admin/classrooms',
     'updateClassroom': (classroomId) => `/admin/classrooms/${classroomId}`,
     'deleteClassroom': (classroomId) => `/admin/classrooms/${classroomId}`,
-    'getClassrooms': '/admin/classrooms/',
+    'getClassrooms': '/admin/classrooms',
     'getClassroomDetails': (classroomId) => `/admin/classrooms/${classroomId}`,
-    'createSportField': '/admin/sport-fields/',
-    'updateSportField': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
-    'deleteSportField': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
-    'getSportFields': '/admin/sport-fields/',
+    'createSportField': '/admin/sport_fields',
+    'updateSportField': (sportFieldId) => `/admin/sport_fields/${sportFieldId}`,
+    'deleteSportField': (sportFieldId) => `/admin/sport_fields/${sportFieldId}`,
+    'getSportFields': '/admin/sport_fields',
     'getSportField-details': (sportFieldId) => `/admin/sport-fields/${sportFieldId}`,
-    'createEquipment': '/admin/equipments/',
+    'createEquipment': '/admin/equipments',
     'updateEquipment': (equipmentId) => `/admin/equipments/${equipmentId}`,
     'deleteEquipment': (equipmentId) => `/admin/equipments/${equipmentId}`,
-    'getEquipments': '/admin/equipments/',
+    'getEquipments': '/admin/equipments',
     'getEquipment-details': (equipmentId) => `/admin/equipments/${equipmentId}`,
     'getPendingBookings': '/admin/bookings/pending',
     'approveBooking': (bookingId) => `/admin/bookings/${bookingId}/approve`,
     'rejectBooking': (bookingId) => `/admin/bookings/${bookingId}/reject`,
     'getAllBookings': '/admin/bookings',
     'getBookingDetails': (bookingId) => `/admin/bookings/${bookingId}`,
+
+
+    // User management
+    getAllUsers: "/admin/users",
+    lockUser: (id) => `/admin/users/${id}/lock`,
+    unlockUser: (id) => `/admin/users/${id}/unlock`,
+
+    // Lecturer requests
+    getLecturerRequests: "/admin/lecturer-requests",
+    approveLecturer: (id) => `/admin/lecturer-requests/${id}/approve`,
+    rejectLecturer: (id) => `/admin/lecturer-requests/${id}/reject`,
 
 
 

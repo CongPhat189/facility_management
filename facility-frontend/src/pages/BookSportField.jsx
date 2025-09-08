@@ -90,7 +90,7 @@ const BookSportField = () => {
             (b) =>
                 b.resourceId === fieldId &&
                 formatSlot(b.startTime, b.endTime) === slot &&
-                b.status !== "CANCELLED"
+                b.status !== "CANCELED"
         );
     };
 
