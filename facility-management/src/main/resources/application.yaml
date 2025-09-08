@@ -3,6 +3,12 @@ server:
   port: 8080
 
 spring:
+  servlet:
+    multipart:
+      max-file-count=-1
+      max-request-size=50MB
+      max-file-size=20MB
+      max-file-count = 20
   datasource:
     url: jdbc:mysql://localhost:3306/oudb
     username: root
@@ -34,3 +40,13 @@ cloudinary:
 jwt:
   secret: oUwfZl+T7r7+Jw5bB65zW98Mt3jzYtPClpZ3aINxqVQ=
   expiration: 86400000 # 24 hours in milliseconds
+
+momo:
+  partner-code: MOMODMJ120250721_TEST
+  access-key: Csil0yiSO0r7Ete4
+  secret-key: YY3r7SE6ZjBEvf6DuZGfKQQwYFbP7W6t
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  return-url: http://localhost:5173/momo-return
+  notify-url: http://localhost:8080/api/payment/momo/ipn
+  request-type: captureWallet
+

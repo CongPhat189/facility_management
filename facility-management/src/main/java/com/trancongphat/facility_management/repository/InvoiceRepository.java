@@ -26,4 +26,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
                           @Param("methodId") Integer methodId,
                           @Param("transId") String transId,
                           @Param("paidAt") LocalDateTime paidAt);
+
+    @Query("SELECT COALESCE(SUM(i.finalAmount), 0) FROM Invoice i " +
+            "WHERE MONTH(i.paidAt) = :month AND YEAR(i.paidAt) = :year " +
+            "AND i.status = com.trancongphat.facility_management.entity.Invoice.InvoiceStatus.PAID")
+    Double getRevenueInMonth(@Param("month") int month, @Param("year") int year);
 }

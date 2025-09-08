@@ -17,6 +17,9 @@ public class Booking {
     @JoinColumn(name = "user_id")
     private User user;
 
+
+
+
     @Column(name = "resource_type")
     @Enumerated(EnumType.STRING)
     private ResourceType resourceType; // CLASSROOM, SPORT_FIELD, EQUIPMENT
@@ -53,7 +56,7 @@ public class Booking {
 
     public enum ResourceType { CLASSROOM, SPORT_FIELD, EQUIPMENT }
 
-    public enum BookingStatus { PENDING, APPROVED, REJECTED, CANCELLED, COMPLETED}
+    public enum BookingStatus { PENDING, APPROVED, REJECTED, CANCELED, COMPLETED}
 
     public Integer getBookingId() {
         return bookingId;

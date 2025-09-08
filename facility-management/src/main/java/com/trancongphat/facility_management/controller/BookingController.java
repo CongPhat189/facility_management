@@ -52,8 +52,10 @@ public class BookingController {
     /**
      * User hủy booking
      */
-    @PostMapping("/cancel/{id}")
-    public ResponseEntity<String> cancelBooking(@PathVariable Integer id, @RequestParam Integer userId) {
+    @PatchMapping("/cancel/{id}")
+    public ResponseEntity<String> cancelBooking(
+            @PathVariable Integer id,
+            @RequestParam Integer userId) {
         bookingService.cancelBooking(id, userId);
         return ResponseEntity.ok("Đã hủy booking thành công");
     }

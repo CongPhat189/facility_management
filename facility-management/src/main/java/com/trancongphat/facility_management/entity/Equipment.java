@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 
 @Entity
@@ -27,8 +28,7 @@ public class Equipment {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    private String purchaseDate;
-    private String lastMaintenance;
+
 
     private String address;
     private String imageUrl;
@@ -91,22 +91,6 @@ public class Equipment {
 
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public String getPurchaseDate() {
-        return purchaseDate;
-    }
-
-    public void setPurchaseDate(String purchaseDate) {
-        this.purchaseDate = purchaseDate;
-    }
-
-    public String getLastMaintenance() {
-        return lastMaintenance;
-    }
-
-    public void setLastMaintenance(String lastMaintenance) {
-        this.lastMaintenance = lastMaintenance;
     }
 
     public String getAddress() {

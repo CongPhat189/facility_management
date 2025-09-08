@@ -21,17 +21,17 @@ public class ClassroomController {
     @Autowired
     private ClassroomService classroomService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClassroomResponseDTO> createClassroom(
-            @Valid @ModelAttribute ClassroomRequestDTO dto) throws IOException {
+            @Valid @RequestBody ClassroomRequestDTO dto) throws IOException {
         ClassroomResponseDTO response = classroomService.createClassroom(dto);
         return ResponseEntity.ok(response);
     }
 
-    @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ClassroomResponseDTO> updateClassroom(
             @PathVariable Integer id,
-            @Valid @ModelAttribute ClassroomRequestDTO dto) throws IOException {
+            @Valid @RequestBody ClassroomRequestDTO dto) throws IOException {
         ClassroomResponseDTO updated = classroomService.updateClassroom(id, dto);
         return ResponseEntity.ok(updated);
     }

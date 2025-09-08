@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@PreAuthorize( "hasRole('ROLE_ADMIN')")
+
 @RestController
 @RequestMapping("api/admin/bookings")
 public class AdminBookingController {

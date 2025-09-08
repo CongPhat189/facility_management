@@ -7,6 +7,8 @@ import java.time.LocalDateTime;
 
 public class BookingResponseDTO {
     private Integer bookingId;
+    private Integer userId;
+    private String fullName;
     private String resourceType;
     private Integer resourceId;
     private LocalDateTime startTime;
@@ -70,9 +72,23 @@ public class BookingResponseDTO {
     public void setPurpose(String purpose) {
         this.purpose = purpose;
     }
+    public Integer getUserId() {
+        return userId;
+    }
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+    public String getFullName() {
+        return fullName;
+    }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
     public static BookingResponseDTO fromEntity(Booking booking) {
         BookingResponseDTO dto = new BookingResponseDTO();
         dto.setBookingId(booking.getBookingId());
+        dto.setUserId(booking.getUser().getUserId());
+        dto.setFullName(booking.getUser().getFullName());
         dto.setResourceType(booking.getResourceType().name());
         dto.setResourceId(booking.getResourceId());
         dto.setStartTime(booking.getStartTime());

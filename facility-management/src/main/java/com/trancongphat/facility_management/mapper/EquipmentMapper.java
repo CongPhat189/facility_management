@@ -14,8 +14,6 @@ public class EquipmentMapper {
         equipment.setSerialNumber(dto.getSerialNumber());
         equipment.setQuantity(dto.getQuantity());
         equipment.setStatus(dto.getStatus());
-        equipment.setPurchaseDate(dto.getPurchaseDate());
-        equipment.setLastMaintenance(dto.getLastMaintenance());
         equipment.setAddress(dto.getAddress());
 
         return equipment;
@@ -30,8 +28,6 @@ public class EquipmentMapper {
         dto.setSerialNumber(equipment.getSerialNumber());
         dto.setQuantity(equipment.getQuantity());
         dto.setStatus(equipment.getStatus());
-        dto.setPurchaseDate(equipment.getPurchaseDate());
-        dto.setLastMaintenance(equipment.getLastMaintenance());
         dto.setAddress(equipment.getAddress());
         dto.setImageUrl(equipment.getImageUrl());
 

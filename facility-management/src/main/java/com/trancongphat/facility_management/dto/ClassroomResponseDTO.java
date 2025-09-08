@@ -11,7 +11,7 @@ public class ClassroomResponseDTO {
     private Integer capacity;
     private String description;
     private Classroom.Status status;
-    private String imageUrl;
+
 
     public Integer getId() {
         return id;
@@ -68,12 +68,6 @@ public class ClassroomResponseDTO {
         this.status = status;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }
 

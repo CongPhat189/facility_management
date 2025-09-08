@@ -26,7 +26,7 @@ public class ClassroomMapper {
         dto.setCapacity(c.getCapacity());
         dto.setDescription(c.getDescription());
         dto.setStatus(c.getStatus());
-        dto.setImageUrl(c.getImageUrl());
+
         return dto;
     }
 }

@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookingService {
@@ -115,6 +114,8 @@ public class BookingService {
     public java.util.List<BookingResponseDTO> getBookingsByUser(Integer userId) {
         return bookingRepo.findByUserUserId((userId)).stream().map(b -> {
             BookingResponseDTO d = new BookingResponseDTO();
+            d.setUserId(b.getUser().getUserId());
+            d.setFullName(b.getUser().getFullName());
             d.setBookingId(b.getBookingId());
             d.setResourceType(b.getResourceType().name());
             d.setResourceId(b.getResourceId());
@@ -130,12 +131,16 @@ public class BookingService {
     //cancel booking
     @Transactional
     public void cancelBooking(Integer bookingId, Integer userId) {
-        Booking booking = bookingRepo.findById( Math.toIntExact(bookingId))
+        Booking booking = bookingRepo.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
-        if (booking.getStatus() == Booking.BookingStatus.CANCELLED) {
+        if (booking.getStatus() == Booking.BookingStatus.CANCELED) {
             throw new IllegalStateException("Booking already cancelled");
         }
-        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        if (!booking.getUser().getUserId().equals(userId)) {
+            throw new SecurityException("You are not allowed to cancel this booking");
+        }
+
+        booking.setStatus(Booking.BookingStatus.CANCELED);
         bookingRepo.save(booking);
     }
     // find booking by id

@@ -25,6 +25,15 @@ public class LecturerRequest {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
+    private String adminNotes;
+
+    public void setAdminNotes(String adminNotes) {
+        this.adminNotes = adminNotes;
+    }
+
+    public String getAdminNotes() {
+        return adminNotes;
+    }
 
     public enum Status {
         PENDING, APPROVED, REJECTED

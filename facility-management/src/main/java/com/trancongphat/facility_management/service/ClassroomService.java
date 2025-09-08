@@ -30,13 +30,6 @@ public class ClassroomService {
 
     public ClassroomResponseDTO createClassroom(ClassroomRequestDTO dto) throws IOException {
         Classroom classroom = ClassroomMapper.toEntity(dto);
-
-        MultipartFile imageFile = dto.getImageUrl();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = cloudinaryService.uploadImage(imageFile);
-            classroom.setImageUrl(imageUrl);
-        }
-
         Classroom saved = classroomRepo.save(classroom);
         return ClassroomMapper.toDto(saved);
     }
@@ -52,11 +45,7 @@ public class ClassroomService {
         classroom.setAddress(dto.getAddress());
 
 
-        MultipartFile imageFile = dto.getImageUrl();
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageUrl = cloudinaryService.uploadImage(imageFile);
-            classroom.setImageUrl(imageUrl);
-        }
+
 
         Classroom updated = classroomRepo.save(classroom);
         return ClassroomMapper.toDto(updated);

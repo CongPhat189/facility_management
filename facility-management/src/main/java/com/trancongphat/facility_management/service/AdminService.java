@@ -1,15 +1,14 @@
 package com.trancongphat.facility_management.service;
 
-import com.trancongphat.facility_management.dto.LecturerAccountRequest;
 import com.trancongphat.facility_management.entity.Booking;
 import com.trancongphat.facility_management.entity.LecturerRequest;
 import com.trancongphat.facility_management.entity.User;
 import com.trancongphat.facility_management.repository.BookingRepository;
 import com.trancongphat.facility_management.repository.LecturerRequestRepository;
 import com.trancongphat.facility_management.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +61,18 @@ public class AdminService {
         emailService.sendLecturerAccountInfo(req.getEmail(), defaultPassword);
     }
     @Transactional
-    public Booking approveBooking(Integer bookingId, Integer adminUserId) {
+    public void rejectLecturerRequest(Long requestId, String reason) throws MessagingException {
+        LecturerRequest req = lecturerRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy yêu cầu"));
+
+        req.setStatus(LecturerRequest.Status.REJECTED);
+        req.setAdminNotes(reason);
+        lecturerRequestRepository.save(req);
+
+        emailService.sendLecturerRequestRejectedEmail(req.getEmail(), reason);
+    }
+    @Transactional
+    public Booking approveBooking(Integer bookingId, Integer adminId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
@@ -71,7 +81,7 @@ public class AdminService {
         }
 
         booking.setStatus(Booking.BookingStatus.APPROVED);
-        booking.setApprovedBy(adminUserId);
+        booking.setApprovedBy(adminId);
         booking.setApprovedAt(LocalDateTime.now());
         bookingRepository.save(booking);
 
@@ -80,7 +90,7 @@ public class AdminService {
         return booking;
     }
     @Transactional
-    public Booking rejectBooking(Integer bookingId, String reason, Integer adminUserId) {
+    public Booking rejectBooking(Integer bookingId, String reason, Integer adminId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
@@ -90,7 +100,7 @@ public class AdminService {
 
         booking.setStatus(Booking.BookingStatus.REJECTED);
         booking.setAdminNotes(reason);
-        booking.setApprovedBy(adminUserId);
+        booking.setApprovedBy(adminId);
         booking.setApprovedAt(LocalDateTime.now());
         bookingRepository.save(booking);
 

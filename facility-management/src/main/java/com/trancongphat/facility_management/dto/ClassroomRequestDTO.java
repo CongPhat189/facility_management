@@ -10,7 +10,7 @@ public class ClassroomRequestDTO {
     private Integer capacity;
     private String description;
     private Classroom.Status status;
-    private MultipartFile imageUrl;
+
 
     public String getRoomNumber() {
         return roomNumber;
@@ -59,12 +59,6 @@ public class ClassroomRequestDTO {
         this.status = status;
     }
 
-    public MultipartFile getImageUrl() {
-        return imageUrl;
-    }
 
-    public void setImageUrl(MultipartFile imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 }
 

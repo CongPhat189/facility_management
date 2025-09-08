@@ -17,14 +17,10 @@ import java.util.stream.Collectors;
 @Service
 public class EquipmentService {
 
-    private final EquipmentRepository equipmentRepository;
-    private final CloudinaryService cloudinaryService;
-
     @Autowired
-    public EquipmentService(EquipmentRepository equipmentRepository, CloudinaryService cloudinaryService) {
-        this.equipmentRepository = equipmentRepository;
-        this.cloudinaryService = cloudinaryService;
-    }
+    private CloudinaryService cloudinaryService;
+    @Autowired
+    private EquipmentRepository equipmentRepository;
 
     // Tạo mới thiết bị
     public EquipmentResponseDTO createEquipment(EquipmentRequestDTO dto) throws IOException {
@@ -64,9 +60,8 @@ public class EquipmentService {
         equipment.setEquipmentType(dto.getEquipmentType());
         equipment.setModel(dto.getModel());
         equipment.setSerialNumber(dto.getSerialNumber());
+        equipment.setQuantity(dto.getQuantity());
         equipment.setStatus(dto.getStatus());
-        equipment.setPurchaseDate(dto.getPurchaseDate());
-        equipment.setLastMaintenance(dto.getLastMaintenance());
         equipment.setAddress(dto.getAddress());
 
         MultipartFile imageFile = dto.getImageUrl();

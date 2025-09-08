@@ -38,7 +38,7 @@ public class PaymentController {
         return ResponseEntity.ok(url);
     }
 
-    // MoMo notify endpoint (configured as notifyUrl)
+
 
 
     @PostMapping("/momo/confirm-local/{invoiceId}")

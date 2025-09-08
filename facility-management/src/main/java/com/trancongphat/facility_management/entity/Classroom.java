@@ -29,8 +29,7 @@ public class Classroom {
 
     @Column(name = "address")
     private String address;
-    @Column(name = "image_url")
-    private String imageUrl;
+
 
 
 
@@ -94,13 +93,7 @@ public class Classroom {
         this.address = address;
     }
 
-    public String getImageUrl() {
-        return imageUrl;
-    }
 
-    public void setImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
-    }
 
     public Timestamp getCreatedAt() {
         return createdAt;
