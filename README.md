@@ -1,7 +1,7 @@
-# 📚 Hệ thống Quản lý Cơ sở Vật chất OU
+# 📚 Hệ thống Quản lý Cơ sở Vật chất Trường Học
 
 ## 📝 Giới thiệu
-Đây là hệ thống quản lý cơ sở vật chất dành cho **trường Đại học Mở TP.HCM (OU)**, giúp sinh viên và giảng viên:
+Đây là hệ thống quản lý cơ sở vật chất dành cho trường học, giúp sinh viên và giảng viên:
 - Đặt phòng học, sân thể thao, mượn thiết bị.
 - Quản lý các yêu cầu mượn/trả tài nguyên.
 - Tích hợp thanh toán MoMo cho đặt sân.
@@ -43,6 +43,6 @@ Hệ thống theo mô hình **Monolithic 3-tiers**:
    - Gửi email, tạo hóa đơn, tích hợp MoMo API.  
 
 3. **Database (MySQL)**  
-   - Lưu trữ người dùng, phòng học, sân thể thao, thiết bị, booking, invoice.  
+   - Lưu trữ người dùng, phòng học, sân thể thao, thiết bị, booking, invoice, payment, request
 
 
