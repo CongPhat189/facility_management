@@ -189,7 +189,7 @@ const BorrowClassroom = () => {
                                                 <div className="ml-3 flex-1">
                                                     <div className="flex items-center justify-between">
                                                         <span className="font-medium text-gray-900">
-                                                            Phòng {c.roomNumber} ({c.description})
+                                                            {c.roomNumber} ({c.description})
                                                         </span>
                                                         <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
                                                             Sức chứa {c.capacity} chỗ

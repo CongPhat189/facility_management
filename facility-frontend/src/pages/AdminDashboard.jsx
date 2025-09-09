@@ -11,12 +11,11 @@ import {
     LogOut,
 } from "lucide-react";
 import { useAuth } from "../context/AuthProvider";
-
-// Import 2 component quản lý
 import UserManagement from "./UserManagement";
 import LecturerRequests from "./LecturerRequests";
 import ResourceManagement from "./ResourceManagement";
 import AdminBookingManagement from "./AdminBookingManagement";
+import Reports from "./Reports"
 
 const AdminDashboard = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -177,16 +176,7 @@ const AdminDashboard = () => {
                         {activeNav === "lecturers" && <LecturerRequests />}
                         {activeNav === "resources" && <ResourceManagement />}
                         {activeNav === "bookings" && <AdminBookingManagement />}
-                        {activeNav === "reports" && (
-                            <div className="bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/50 p-8">
-                                <h3 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 via-cyan-600 to-blue-600 bg-clip-text text-transparent mb-4">
-                                    Báo cáo thống kê
-                                </h3>
-                                <p className="text-slate-700">
-                                    Nội dung báo cáo thống kê sẽ được hiển thị ở đây...
-                                </p>
-                            </div>
-                        )}
+                        {activeNav === "reports" && <Reports />}
                     </div>
                 </main>
             </div>

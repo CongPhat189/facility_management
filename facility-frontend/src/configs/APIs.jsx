@@ -68,6 +68,24 @@ export const endpoints = {
     getLecturerRequests: "/admin/lecturer-requests",
     approveLecturer: (id) => `/admin/lecturer-requests/${id}/approve`,
     rejectLecturer: (id) => `/admin/lecturer-requests/${id}/reject`,
+    report_monthly_raw: (month, year) =>
+        `/report/raw/monthly?month=${month}&year=${year}`,
+    report_range_raw: (from, to) =>
+        `/report/raw/range?from=${from}&to=${to}`,
+
+    report_bookings_by_type: (from, to) =>
+        `/report/raw/bookings-by-type?from=${from}&to=${to}`,
+    report_bookings_by_status: (from, to) =>
+        `/report/raw/bookings-by-status?from=${from}&to=${to}`,
+    report_revenue_sport_field: (from, to) =>
+        `/report/raw/revenue-sport-field?from=${from}&to=${to}`,
+    report_peak_hours: (from, to) =>
+        `/report/raw/peak-hours?from=${from}&to=${to}`,
+
+    report_analysis_monthly: (m, y, mom = true) =>
+        `/report/analysis?month=${m}&year=${y}&mom=${mom}`,
+    report_analysis_range: (from, to) =>
+        `/report/analysis-range?from=${from}&to=${to}`,
 
 
 

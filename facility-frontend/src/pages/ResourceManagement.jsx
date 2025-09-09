@@ -699,6 +699,12 @@ const ResourceManagement = () => {
                                                         {e.quantity}
                                                     </span>
                                                 </div>
+                                                <div className="flex justify-between text-sm">
+                                                    <span className="text-gray-600">Địa chỉ:</span>
+                                                    <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                                                        {e.address}
+                                                    </span>
+                                                </div>
                                             </div>
                                             <div className="flex gap-2">
                                                 <button
