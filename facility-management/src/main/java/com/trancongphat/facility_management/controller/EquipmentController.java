@@ -21,7 +21,7 @@ public class EquipmentController {
     @Autowired
     private EquipmentService equipmentService;
 
-    // ✅ Tạo mới thiết bị
+    //  Tạo mới thiết bị
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EquipmentResponseDTO> createEquipment(
             @Valid @ModelAttribute EquipmentRequestDTO dto) throws IOException {
@@ -29,7 +29,7 @@ public class EquipmentController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Cập nhật thiết bị
+    // Cập nhật thiết bị
     @PatchMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<EquipmentResponseDTO> updateEquipment(
             @PathVariable Integer id,
@@ -38,21 +38,21 @@ public class EquipmentController {
         return ResponseEntity.ok(updated);
     }
 
-    // ✅ Xoá thiết bị
+    //  Xoá thiết bị
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEquipment(@PathVariable Integer id) {
         equipmentService.deleteEquipment(id);
         return ResponseEntity.ok("Deleted equipment with id: " + id);
     }
 
-    // ✅ Lấy tất cả thiết bị
+    //  Lấy tất cả thiết bị
     @GetMapping
     public ResponseEntity<List<EquipmentResponseDTO>> getAllEquipments() {
         List<EquipmentResponseDTO> list = equipmentService.getAllEquipments();
         return ResponseEntity.ok(list);
     }
 
-    // ✅ Lấy chi tiết một thiết bị
+    //  Lấy chi tiết một thiết bị
     @GetMapping("/{id}")
     public ResponseEntity<EquipmentResponseDTO> getEquipmentById(@PathVariable Integer id) {
         EquipmentResponseDTO response = equipmentService.getEquipmentById(id);

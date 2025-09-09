@@ -21,27 +21,19 @@ public class BookingController {
         this.bookingService = bookingService;
     }
 
-    /**
-     * User tạo booking mới
-     */
     @PostMapping("/create")
     public ResponseEntity<BookingResponseDTO> createBooking(@RequestBody CreateBookingRequest req) {
         BookingResponseDTO res = bookingService.createBooking(req);
         return ResponseEntity.ok(res);
     }
 
-    /**
-     * Lấy thông tin 1 booking theo ID
-     */
+
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Booking>> getBooking(@PathVariable Integer id) {
         Optional<Booking> booking = bookingService.findById(id);
         return ResponseEntity.ok(booking);
     }
 
-    /**
-     * Lấy tất cả booking của 1 user
-     */
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<BookingResponseDTO>> getUserBookings(@PathVariable Integer userId) {
         List<BookingResponseDTO> bookings = bookingService.getBookingsByUser(userId);
@@ -49,9 +41,6 @@ public class BookingController {
     }
 
 
-    /**
-     * User hủy booking
-     */
     @PatchMapping("/cancel/{id}")
     public ResponseEntity<String> cancelBooking(
             @PathVariable Integer id,

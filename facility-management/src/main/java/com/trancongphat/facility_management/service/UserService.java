@@ -19,8 +19,7 @@ public class UserService {
 
     @Autowired private UserRepository userRepository;
     @Autowired private LecturerRequestRepository lecturerRequestRepository;
-    @Autowired
-    private CloudinaryService cloudinaryService;
+    @Autowired private CloudinaryService cloudinaryService;
     @Autowired private EmailService emailService;
 
     public void registerStudent(RegisterRequest req) throws Exception {

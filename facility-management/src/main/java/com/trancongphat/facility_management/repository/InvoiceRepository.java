@@ -27,8 +27,15 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
                           @Param("transId") String transId,
                           @Param("paidAt") LocalDateTime paidAt);
 
-    @Query("SELECT COALESCE(SUM(i.finalAmount), 0) FROM Invoice i " +
-            "WHERE MONTH(i.paidAt) = :month AND YEAR(i.paidAt) = :year " +
-            "AND i.status = com.trancongphat.facility_management.entity.Invoice.InvoiceStatus.PAID")
-    Double getRevenueInMonth(@Param("month") int month, @Param("year") int year);
+    // Tổng doanh thu từ sân thể thao trong khoảng thời gian
+    @Query("""
+        SELECT COALESCE(SUM(i.totalAmount), 0)
+        FROM Invoice i
+        JOIN i.booking b
+        WHERE b.resourceType = com.trancongphat.facility_management.entity.Booking.ResourceType.SPORT_FIELD
+          AND b.startTime BETWEEN :from AND :to
+          AND i.status = com.trancongphat.facility_management.entity.Invoice.InvoiceStatus.PAID
+    """)
+    Double sumRevenueSportFields(@Param("from") LocalDateTime from,
+                                 @Param("to") LocalDateTime to);
 }

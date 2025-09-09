@@ -2,6 +2,7 @@ package com.trancongphat.facility_management.service;
 
 import com.trancongphat.facility_management.entity.*;
 import com.trancongphat.facility_management.repository.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,21 +13,13 @@ import java.time.LocalDateTime;
 
 @Service
 public class InvoiceService {
+    @Autowired
+    private SportFieldRepository sportFieldRepo;
+    @Autowired
+    private InvoiceRepository invoiceRepo;
+    @Autowired
+    private  InvoiceDetailRepository detailRepo;
 
-    private final SportFieldRepository sportFieldRepo;
-    private final PromotionRepository promotionRepo;
-    private final InvoiceRepository invoiceRepo;
-    private final InvoiceDetailRepository detailRepo;
-
-    public InvoiceService(SportFieldRepository sportFieldRepo,
-                          PromotionRepository promotionRepo,
-                          InvoiceRepository invoiceRepo,
-                          InvoiceDetailRepository detailRepo) {
-        this.sportFieldRepo = sportFieldRepo;
-        this.promotionRepo = promotionRepo;
-        this.invoiceRepo = invoiceRepo;
-        this.detailRepo = detailRepo;
-    }
 
     @Transactional
     public Invoice createInvoiceForFieldBooking(Booking booking) {

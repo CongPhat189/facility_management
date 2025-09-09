@@ -57,10 +57,10 @@ public class PaymentService {
         PaymentMethod cash = methodRepo.findByMethodNameIgnoreCase("CASH")
                 .orElseThrow(() -> new IllegalStateException("CASH method not found"));
 
-        // ✅ update trực tiếp invoice
+        //  update trực tiếp invoice
         invoiceRepo.updateInvoicePaid(invoiceId, cash.getMethodId(), "CASH-" + UUID.randomUUID(), LocalDateTime.now());
 
-        // ✅ update booking
+        // update booking
         inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
         if (inv.getBooking() != null) {
@@ -155,10 +155,10 @@ public class PaymentService {
                 .orElseThrow(() -> new IllegalStateException("MOMO method missing"));
 
 
-        // ✅ update trực tiếp invoice
+        //  update trực tiếp invoice
         invoiceRepo.updateInvoicePaid(invoiceId, momo.getMethodId(), momoTransId, LocalDateTime.now());
 
-        // ✅ update booking
+        //  update booking
         inv = invoiceRepo.findById(invoiceId)
                 .orElseThrow(() -> new IllegalArgumentException("Invoice not found"));
         if (inv.getBooking() != null) {
