@@ -6,7 +6,7 @@
 - Quản lý các yêu cầu mượn/trả tài nguyên.
 - Tích hợp thanh toán MoMo cho đặt sân.
 - Gửi email thông báo tự động qua Gmail API.
-- Hỗ trợ chatbot AI thông minh giải đáp thắc mắc.
+- Tích hợp AI phân tích báo cáo qua Gemini API
 
 Ứng dụng được xây dựng theo kiến trúc **Monolithic** (Spring Boot + ReactJS) và kết nối với cơ sở dữ liệu **MySQL**.  
 
