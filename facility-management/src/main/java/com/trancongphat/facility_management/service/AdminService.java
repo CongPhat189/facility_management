@@ -1,5 +1,6 @@
 package com.trancongphat.facility_management.service;
 
+import com.trancongphat.facility_management.dto.NotificationDTO;
 import com.trancongphat.facility_management.entity.Booking;
 import com.trancongphat.facility_management.entity.LecturerRequest;
 import com.trancongphat.facility_management.entity.User;
@@ -9,6 +10,7 @@ import com.trancongphat.facility_management.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,8 @@ public class AdminService {
     @Autowired private LecturerRequestRepository lecturerRequestRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private BookingRepository bookingRepository;
+    @Autowired private SimpMessagingTemplate messagingTemplate;
+    @Autowired private NotificationService notificationService;
     @Transactional
     public void approveLecturerRequest(Long requestId) {
         LecturerRequest req = lecturerRequestRepository.findById(requestId)
@@ -70,6 +74,7 @@ public class AdminService {
         lecturerRequestRepository.save(req);
 
         emailService.sendLecturerRequestRejectedEmail(req.getEmail(), reason);
+
     }
     @Transactional
     public Booking approveBooking(Integer bookingId, Integer adminId) {
@@ -86,6 +91,11 @@ public class AdminService {
         bookingRepository.save(booking);
 
         emailService.sendBookingApprovedEmail(booking.getUser().getEmail(), booking);
+        // Gửi socket realtime
+        notificationService.notifyUser(
+                booking.getUser().getEmail(),
+                new NotificationDTO("BOOKING_APPROVED", "Đơn đặt phòng #" + bookingId + " đã được duyệt")
+        );
 
         return booking;
     }
@@ -106,6 +116,11 @@ public class AdminService {
 
         emailService.sendBookingRejectedEmail(booking.getUser().getEmail(), booking, reason);
 
+        // Gửi socket realtime
+        notificationService.notifyUser(
+                booking.getUser().getEmail(),
+                new NotificationDTO("BOOKING_REJECTED", "Đơn đặt phòng #" + bookingId + " đã bị từ chối. Lý do: " + reason)
+        );
         return booking;
     }
 

@@ -1,0 +1,58 @@
+# Application configuration file for a Spring Boot application
+server:
+  port: 8080
+
+spring:
+  servlet:
+    multipart:
+      max-file-count=-1
+      max-request-size=50MB
+      max-file-size=20MB
+  datasource:
+    url: jdbc:mysql://localhost:3306/oudb
+    username: root
+    password: Admin123
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: tpn18092004@gmail.com
+    password: umbpwzggmchajxtc
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls.enable: true
+
+cloudinary:
+  cloud-name: dwd4b8lcx
+  api-key: 271116451416351
+  api-secret: fbyd8zzUl4OSzBFxkf4_cr4jNTk
+
+jwt:
+  secret: oUwfZl+T7r7+Jw5bB65zW98Mt3jzYtPClpZ3aINxqVQ=
+  expiration: 86400000 # 24 hours in milliseconds
+
+momo:
+  partner-code: MOMODMJ120250721_TEST
+  access-key: Csil0yiSO0r7Ete4
+  secret-key: YY3r7SE6ZjBEvf6DuZGfKQQwYFbP7W6t
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  return-url: http://localhost:5173/momo-return
+  notify-url: http://localhost:8080/api/payment/momo/ipn
+  request-type: captureWallet
+gemini:
+  api:
+    key: AIzaSyB0f0hW08xJWDIm7ING4zBYsHRPB-DvoHs
+    url: https://generativelanguage.googleapis.com/v1beta
+    model: gemini-1.5-flash
+
+
+
