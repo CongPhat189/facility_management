@@ -312,11 +312,7 @@ const AdminBookingManagement = () => {
                                                     </span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4">
-                                                <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
-                                                    {b.resourceId}
-                                                </span>
-                                            </td>
+
                                             <td className="px-6 py-4">
                                                 <div className="text-sm space-y-1">
                                                     <div className="flex items-center gap-1 text-green-600">

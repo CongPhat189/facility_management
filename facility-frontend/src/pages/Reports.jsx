@@ -101,7 +101,7 @@ export default function Reports() {
 
     useEffect(() => {
         if (tab === "monthly") fetchMonthly();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+
     }, [tab]);
 
     // AI analysis

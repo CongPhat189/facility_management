@@ -5,6 +5,8 @@ import { useAuth } from "../context/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import { Client } from '@stomp/stompjs';
+
 import ChatbotFAQ from "../components/ChatbotFAQ";
 
 const Dashboard = () => {
@@ -19,6 +21,47 @@ const Dashboard = () => {
 
 
     const navigate = useNavigate();
+    const [notifications, setNotifications] = useState([]);
+    const [stompClient, setStompClient] = useState(null);
+
+    useEffect(() => {
+        if (!user || !user.email) return;
+
+        const client = new Client({
+            brokerURL: "ws://localhost:8080/ws", // kết nối WebSocket BE
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log("✅ STOMP connected");
+
+                // Subscribe theo email user
+                client.subscribe(`/user/${user.email}/queue/notifications`, (msg) => {
+                    try {
+                        const notif = JSON.parse(msg.body);
+                        setNotifications((prev) => [notif, ...prev]);
+                        toast.info(notif.message);
+                    } catch (err) {
+                        console.error("❌ Parse notification error:", err, msg.body);
+                    }
+                });
+            },
+            onStompError: (frame) => {
+                console.error("❌ STOMP error:", frame.headers["message"]);
+            },
+        });
+
+        client.activate();
+        setStompClient(client);
+
+        return () => {
+            if (client && client.active) {
+                client.deactivate();
+                console.log("🔌 STOMP disconnected");
+            }
+        };
+    }, [user]);
+
+
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -143,9 +186,16 @@ const Dashboard = () => {
                             </span>
                         </div>
 
-                        <button className="p-2 hover:bg-white/50 rounded-lg transition-all">
+                        <button className="relative p-2 hover:bg-white/50 rounded-lg transition-all">
                             <Bell className="w-5 h-5 text-slate-500" />
+                            {notifications.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5
+                                    rounded-full flex items-center justify-center">
+                                    {notifications.length}
+                                </span>
+                            )}
                         </button>
+
 
                         <div className="flex items-center space-x-3 bg-white/50 rounded-full pl-1 pr-4 py-1">
                             <img

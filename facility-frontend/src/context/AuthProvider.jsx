@@ -41,6 +41,7 @@ export const AuthProvider = ({ children }) => {
             const currentUser = {
                 id: response.data.userId,
                 name: response.data.fullName || response.data.name,
+                email: response.data.email,
                 role: response.data.role,
                 avatar: response.data.avatar
             };
