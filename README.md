@@ -20,7 +20,7 @@
 - **MySQL**: hệ quản trị cơ sở dữ liệu.
 - **Gmail API**: gửi email xác nhận tài khoản & thông báo.
 - **MoMo Payment API**: thanh toán điện tử khi đặt sân thể thao.
-- **Gemini AI API (tùy chọn)**: chatbot hỗ trợ.
+- **Gemini AI API **: phân tích tổng hợp dữ liệu báo cáo
 
 ### Frontend
 - **ReactJS** (SPA)
