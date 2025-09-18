@@ -36,11 +36,12 @@ Hệ thống theo mô hình **Monolithic 3-tiers**:
 1. **Frontend (ReactJS)**  
    - Giao diện đặt phòng/sân/thiết bị.
    - Quản lý dashboard của sinh viên, giảng viên, quản trị viên.
-   - Tích hợp chatbot AI.  
+   - Tích hợp chatbot hướng dẫn. 
 
 2. **Backend (Spring Boot)**  
    - Xử lý nghiệp vụ (booking, quản lý tài nguyên, phê duyệt).
-   - Gửi email, tạo hóa đơn, tích hợp MoMo API.  
+   - Gửi email, tạo hóa đơn, tích hợp MoMo API.
+   - Phân tích báo cáo tích hợp Gemini API
 
 3. **Database (MySQL)**  
    - Lưu trữ người dùng, phòng học, sân thể thao, thiết bị, booking, invoice, payment, request
